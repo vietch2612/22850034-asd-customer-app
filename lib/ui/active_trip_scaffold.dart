@@ -168,7 +168,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                                 Shimmer.fromColors(
                                   baseColor: Theme.of(context)
                                           .textTheme
-                                          .bodyText1!
+                                          .bodyLarge!
                                           .color ??
                                       Colors.black,
                                   highlightColor:
@@ -178,7 +178,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                                           trip.activeTrip!.status),
                                       style: Theme.of(context)
                                           .textTheme
-                                          .subtitle1
+                                          .titleMedium
                                           ?.copyWith(
                                               fontWeight: FontWeight.bold,
                                               color:
@@ -196,7 +196,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                                 onPressed: pendingUpdate
                                     ? null
                                     : () => trip.cancelTrip(),
-                                child: Text('Cancel Order')),
+                                child: const Text('Cancel Order')),
                           )
                         ],
                       )),

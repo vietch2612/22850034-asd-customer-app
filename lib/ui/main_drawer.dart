@@ -68,28 +68,6 @@ Widget mainDrawer(BuildContext context, {bool isLoggedIn = true}) => Drawer(
             height: 10,
             thickness: 1,
           ),
-          ListTile(
-            title: const Text('Connect with Developer'),
-            subtitle: Text(
-              'www.linkedin.com/in/yakiv/',
-              overflow: TextOverflow.ellipsis,
-            ),
-            onTap: () {
-              launchUrl('https://www.linkedin.com/in/yakiv/');
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: const Text('Get Full Source Code'),
-            subtitle: Text(
-              'github.com/YakivGalkin/flutterbase-taxi',
-              overflow: TextOverflow.ellipsis,
-            ),
-            onTap: () {
-              launchUrl('https://github.com/YakivGalkin/flutterbase-taxi');
-              Navigator.pop(context);
-            },
-          ),
         ],
       ),
     );
