@@ -1,7 +1,4 @@
-// Project: Flutter-base Taxi
-// Purpose: Testing integration of Flutter & Google Maps
-// Platforms:  Web, iOS and Android
-// Authors: www.flutterbase.com
+// 22850034 ASD Customer App Flutter
 
 import 'package:flutter/material.dart';
 import 'package:customer_app/providers/active_trip.dart';
