@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:customer_app/providers/active_trip.dart';
 import 'package:customer_app/providers/location.dart';
 import 'package:customer_app/providers/theme.dart';
-import 'package:customer_app/ui/common.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 
@@ -31,7 +30,7 @@ Widget mainDrawer(BuildContext context, {bool isLoggedIn = true}) => Drawer(
                     "Flutterbase Taxi",
                     style: Theme.of(context)
                         .textTheme
-                        .headline6
+                        .titleLarge
                         ?.copyWith(color: Colors.black),
                   ),
                 ],
@@ -57,7 +56,7 @@ Widget mainDrawer(BuildContext context, {bool isLoggedIn = true}) => Drawer(
               leading: const Icon(Icons.logout),
               title: const Text('Logout'),
               onTap: () {
-                WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                   TripProvider.of(context, listen: false).deactivateTrip();
                   LocationProvider.of(context, listen: false).reset();
                 });

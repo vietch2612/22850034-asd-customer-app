@@ -11,7 +11,7 @@ ThemeData getThemeData() {
   return ThemeData.from(
       colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.green,
-          backgroundColor: Color.fromRGBO(255, 255, 255, 1)));
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 1)));
 }
 
 class ThemeProvider extends ChangeNotifier {
@@ -23,8 +23,8 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   ButtonStyle get roundButtonStyle => ElevatedButton.styleFrom(
-      minimumSize: Size(150, 60),
-      shape: RoundedRectangleBorder(
+      minimumSize: const Size(150, 60),
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
         Radius.circular(
           30,
@@ -32,8 +32,8 @@ class ThemeProvider extends ChangeNotifier {
       )));
 
   ButtonStyle get roundOutlinedButtonStyle => OutlinedButton.styleFrom(
-      minimumSize: Size(150, 60),
-      shape: RoundedRectangleBorder(
+      minimumSize: const Size(150, 60),
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
         Radius.circular(
           30,

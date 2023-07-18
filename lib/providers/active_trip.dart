@@ -28,13 +28,15 @@ class TripProvider with ChangeNotifier {
   }
 
   void stopTripWorkflow() {
-    [
+    for (var t in [
       allocatedStateTimer,
       arrivedStateTimer,
       drivingStateTimer,
       completedStateTimer,
       drivingProgressTimer,
-    ].forEach((t) => t?.cancel());
+    ]) {
+      t?.cancel();
+    }
     taxiMarkerLatLng = null;
   }
 
@@ -59,13 +61,13 @@ class TripProvider with ChangeNotifier {
   void activateTrip(TripDataEntity trip) {
     stopTripWorkflow();
     activeTrip = trip;
-    allocatedStateTimer = Timer(
-        Duration(seconds: 1), () => setTripStatus(ExTripStatus.allocated));
-    arrivedStateTimer =
-        Timer(Duration(seconds: 2), () => setTripStatus(ExTripStatus.arrived));
-    final drivingDuration = Duration(seconds: 15);
+    allocatedStateTimer = Timer(const Duration(seconds: 1),
+        () => setTripStatus(ExTripStatus.allocated));
+    arrivedStateTimer = Timer(
+        const Duration(seconds: 2), () => setTripStatus(ExTripStatus.arrived));
+    const drivingDuration = Duration(seconds: 15);
 
-    drivingStateTimer = Timer(Duration(seconds: 3), () {
+    drivingStateTimer = Timer(const Duration(seconds: 3), () {
       setTripStatus(ExTripStatus.driving);
 
       final drivingStartTime = DateTime.now();
@@ -74,7 +76,7 @@ class TripProvider with ChangeNotifier {
           Timer(drivingDuration, () => setTripStatus(ExTripStatus.completed));
 
       drivingProgressTimer =
-          Timer.periodic(Duration(milliseconds: 300), (timer) {
+          Timer.periodic(const Duration(milliseconds: 300), (timer) {
         final now = DateTime.now();
         if (trip.status != ExTripStatus.driving ||
             DateTime.now().compareTo(drivingEndTime) >= 0) {

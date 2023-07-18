@@ -1,7 +1,6 @@
 // 22850034 ASD Customer App Flutter
 
 import 'package:flutter/material.dart';
-import 'package:customer_app/providers/location.dart';
 
 import 'main_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,14 +15,14 @@ void showScaffoldSnackBarMessage(String message) =>
     rootScaffoldMessengerKey.currentState
         ?.showSnackBar(SnackBar(content: Text(message)));
 
-void launchUrl(String url) async {
-  if (!await launch(url))
+void openUrl(String url) async {
+  if (!await launchUrl(url as Uri)) {
     showScaffoldSnackBarMessage('Could not open url: "$url"');
+  }
 }
 
 Widget buildAppScaffold(BuildContext context, Widget child,
     {isLoggedIn = true}) {
-  final isLocationFixed = LocationProvider.of(context).isDemoLocationFixed;
   return Scaffold(
     floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
     floatingActionButton: Builder(builder: (context) {
@@ -31,7 +30,7 @@ Widget buildAppScaffold(BuildContext context, Widget child,
         padding: const EdgeInsets.only(top: 8.0),
         child: FloatingActionButton(
           mouseCursor: SystemMouseCursors.click,
-          child: Icon(
+          child: const Icon(
             Icons.menu,
           ),
 

@@ -74,20 +74,20 @@ class LocationScaffold extends StatelessWidget {
             ),
             Expanded(child: Lottie.asset('assets/lottie/taxi-animation.json')),
             if (pendingDetermineLocation) ...[
-              LinearProgressIndicator(),
-              Text('Please wait while your prosition is determined....'),
+              const LinearProgressIndicator(),
+              const Text('Please wait while your prosition is determined....'),
             ],
             if (!pendingDetermineLocation) ...[
               Text(
                 'Select your location',
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               ListTile(
-                leading: Icon(Icons.home),
-                title: Text('S701 Vinhomes Grand Park'),
-                subtitle: Text("Long Binh, Thu Duc City"),
+                leading: const Icon(Icons.home),
+                title: const Text('S701 Vinhomes Grand Park'),
+                subtitle: const Text("Long Binh, Thu Duc City"),
                 onTap: () => _setDemoLocation(context, homeAddress),
-                trailing: Icon(Icons.chevron_right),
+                trailing: const Icon(Icons.chevron_right),
               ),
               ListTile(
                 leading: const Icon(Icons.business),
@@ -97,15 +97,15 @@ class LocationScaffold extends StatelessWidget {
                 onTap: () => _setDemoLocation(context, homeAddress),
                 trailing: const Icon(Icons.chevron_right),
               ),
-              Divider(),
+              const Divider(),
               ListTile(
-                leading: Icon(Icons.search),
-                title: Text('Search address'),
+                leading: const Icon(Icons.search),
+                title: const Text('Search address'),
                 onTap: () => _selectCurrentLocation(context),
               ),
               ListTile(
-                leading: Icon(Icons.gps_fixed),
-                title: Text('Use my current location by GPS'),
+                leading: const Icon(Icons.gps_fixed),
+                title: const Text('Use my current location by GPS'),
                 onTap: () => LocationProvider.of(context, listen: false)
                     .determineCurrentLocation(),
               )

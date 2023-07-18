@@ -14,7 +14,7 @@ import 'package:shimmer/shimmer.dart';
 Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
     Column(children: [
       ListTile(
-          leading: Icon(Icons.person_pin_circle),
+          leading: const Icon(Icons.person_pin_circle),
           title: Text(
             tripData.from.mainText,
             overflow: TextOverflow.ellipsis,
@@ -30,10 +30,11 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
                 height: 3,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).textTheme.bodyText1?.color ??
+                    color: Theme.of(context).textTheme.bodyLarge?.color ??
                         Colors.white)),
             Text(tripData.from.secondaryText,
-                overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12))
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12))
           ])),
       ListTile(
           leading: const Icon(Icons.location_on_outlined),
@@ -52,7 +53,7 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
                 height: 3,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).textTheme.bodyText1?.color ??
+                    color: Theme.of(context).textTheme.bodyLarge?.color ??
                         Colors.white)),
             Text(tripData.to.secondaryText,
                 overflow: TextOverflow.ellipsis,
@@ -101,23 +102,23 @@ class _ActiveTripState extends State<ActiveTrip> {
                   icon: AssetLoaderProvider.of(context).markerIconFrom!,
                   position: TripProvider.of(context).activeTrip!.from.toLatLng,
                   //smooth marker update does not work on flutter web
-                  markerId: MarkerId('fromMarker ' +
-                      (kIsWeb ? DateTime.now().toIso8601String() : '')),
+                  markerId: MarkerId(
+                      'fromMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
                 ),
                 Marker(
                   icon: AssetLoaderProvider.of(context).markerIconTo,
                   position: TripProvider.of(context).activeTrip!.to.toLatLng,
                   //smooth marker update does not work on flutter web
-                  markerId: MarkerId('toMarker ' +
-                      (kIsWeb ? DateTime.now().toIso8601String() : '')),
+                  markerId: MarkerId(
+                      'toMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
                 ),
                 if (trip.isActive && trip.taxiMarkerLatLng != null)
                   Marker(
                     icon: AssetLoaderProvider.of(context).markerIconTaxi,
                     position: TripProvider.of(context).taxiMarkerLatLng!,
                     //smooth marker update does not work on flutter web
-                    markerId: MarkerId('taxiMarker ' +
-                        (kIsWeb ? DateTime.now().toIso8601String() : '')),
+                    markerId: MarkerId(
+                        'taxiMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
                   )
               },
               polylines: <Polyline>{trip.activeTrip!.polyline},
@@ -140,20 +141,20 @@ class _ActiveTripState extends State<ActiveTrip> {
             )),
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).backgroundColor,
+                color: Theme.of(context).colorScheme.background,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, -3), // changes position of shadow
+                    offset: const Offset(0, -3), // changes position of shadow
                   ),
                 ],
               ),
               child: Column(
                 children: [
                   tripFromTo(context, trip.activeTrip!),
-                  Divider(height: 1),
+                  const Divider(height: 1),
                   SizedBox(
                       height: 80,
                       child: Row(

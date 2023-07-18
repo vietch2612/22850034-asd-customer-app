@@ -7,15 +7,15 @@ import "package:google_maps_webservice/geocoding.dart";
 import 'package:google_maps_webservice/directions.dart' as dir;
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 
-const String _appleBundleId = "flutterbasetaxi.flutterbase.com";
+// const String _appleBundleId = "flutterbasetaxi.flutterbase.com";
 const String _googleMapsApiKey = "_FLUTTERBASETAXI_API_KEY_";
-final _googleApiHeaders = {"x-ios-bundle-identifier": _appleBundleId};
+// final _googleApiHeaders = {"x-ios-bundle-identifier": _appleBundleId};
 
 //Platform.environment['API_KEY']
 
-final prodApiProxy =
+const prodApiProxy =
     "https://europe-west2-flutterbasedotcom.cloudfunctions.net/FlutterbaseTaxiWebDemo";
-final googleApiProxy = "$prodApiProxy/__https__/maps.googleapis.com/maps/api";
+const googleApiProxy = "$prodApiProxy/__https__/maps.googleapis.com/maps/api";
 
 final apiGooglePlaces = GoogleMapsPlaces(
   apiKey: _googleMapsApiKey,
@@ -49,8 +49,8 @@ List<LatLng>? createPolylinePointsFromDirections(
 }
 
 // Copied from Google map style builder
-final String googleMapDefaultStyle = '[]';
-final String googleMapDarkStyle = '''[
+const String googleMapDefaultStyle = '[]';
+const String googleMapDarkStyle = '''[
   {
     "elementType": "geometry",
     "stylers": [

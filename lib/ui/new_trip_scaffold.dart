@@ -23,7 +23,7 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:shimmer/shimmer.dart';
 
 class NewTrip extends StatefulWidget {
-  NewTrip({Key? key}) : super(key: key);
+  const NewTrip({Key? key}) : super(key: key);
 
   @override
   _NewTripState createState() => _NewTripState();
@@ -65,7 +65,7 @@ class _NewTripState extends State<NewTrip> {
       final polylinePoints = createPolylinePointsFromDirections(response)!;
 
       tripPolyline = Polyline(
-          polylineId: PolylineId('polyline-1'),
+          polylineId: const PolylineId('polyline-1'),
           width: 5,
           color: Colors.blue,
           points: polylinePoints);
@@ -100,17 +100,17 @@ class _NewTripState extends State<NewTrip> {
       if (maxx > 180) minx = 180;
       if (maxy > 90) maxy = 90;
     } else {
-      [
+      for (var p in [
         from!.toLatLng,
         to!.toLatLng,
         if (tripPolyline != null) ...tripPolyline!.points
-      ].forEach((p) {
+      ]) {
         minx = min(minx, p.longitude);
         maxx = max(maxx, p.longitude);
 
         miny = min(miny, p.latitude);
         maxy = max(maxy, p.latitude);
-      });
+      }
     }
 
     final newCameraViewBounds = LatLngBounds(
@@ -123,7 +123,7 @@ class _NewTripState extends State<NewTrip> {
 
       if (mapControllerCompleter.isCompleted == false) return;
 
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || _mapCameraViewBounds == null) return;
 
         mapController!.animateCamera(
@@ -168,10 +168,11 @@ class _NewTripState extends State<NewTrip> {
           secondaryText: p.structuredFormatting?.secondaryText ?? '');
 
       setState(() {
-        if (isFromAdr)
+        if (isFromAdr) {
           from = placeAddress;
-        else
+        } else {
           to = placeAddress;
+        }
       });
 
       await recalcRoute();
@@ -224,8 +225,7 @@ class _NewTripState extends State<NewTrip> {
   Widget build(BuildContext context) {
     return buildAppScaffold(
       context,
-      Container(
-          child: Column(
+      Column(
         children: [
           Expanded(
             child: GoogleMap(
@@ -246,17 +246,15 @@ class _NewTripState extends State<NewTrip> {
                   Marker(
                     icon: AssetLoaderProvider.of(context).markerIconFrom!,
                     position: from!.toLatLng,
-                    markerId: MarkerId('marker-From' +
-                        (kIsWeb
-                            ? DateTime.now().toIso8601String()
-                            : "")), // Flutter Google Maps for Web does not update marker position properly
+                    markerId: MarkerId(
+                        'marker-From${kIsWeb ? DateTime.now().toIso8601String() : ""}'), // Flutter Google Maps for Web does not update marker position properly
                   ),
                 if (to != null)
                   Marker(
                     icon: AssetLoaderProvider.of(context).markerIconTo,
                     position: to!.toLatLng,
-                    markerId: MarkerId('marker-To' +
-                        (kIsWeb ? DateTime.now().toIso8601String() : "")),
+                    markerId: MarkerId(
+                        'marker-To${kIsWeb ? DateTime.now().toIso8601String() : ""}'),
                   ),
               },
               polylines: tripPolyline != null
@@ -282,41 +280,41 @@ class _NewTripState extends State<NewTrip> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
+              color: Theme.of(context).colorScheme.background,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 3,
                   blurRadius: 3,
-                  offset: Offset(0, -3), // changes position of shadow
+                  offset: const Offset(0, -3), // changes position of shadow
                 ),
               ],
             ),
             child: Column(children: [
               ListTile(
-                leading: Icon(Icons.person_pin_circle),
+                leading: const Icon(Icons.person_pin_circle),
                 title: Text(
                   from?.mainText ?? "",
                   overflow: TextOverflow.ellipsis,
                 ),
                 subtitle: Row(
                   children: [
-                    Text(
+                    const Text(
                       'From',
                       style: TextStyle(color: Colors.green),
                     ),
                     Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
                         width: 3,
                         height: 3,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color:
-                                Theme.of(context).textTheme.bodyText1?.color ??
+                                Theme.of(context).textTheme.bodyLarge?.color ??
                                     Colors.white)),
                     Text(from?.secondaryText ?? "",
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12))
+                        style: const TextStyle(fontSize: 12))
                   ],
                 ),
                 onTap: () => autocompleteAddress(
@@ -325,14 +323,14 @@ class _NewTripState extends State<NewTrip> {
                         .currentAddress!
                         .location),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 4,
               ),
               (to == null)
                   ? ListTile(
-                      leading: Icon(Icons.location_on_outlined),
-                      title: Text('To...'),
-                      subtitle: Text(''),
+                      leading: const Icon(Icons.location_on_outlined),
+                      title: const Text('To...'),
+                      subtitle: const Text(''),
                       onTap: () => autocompleteAddress(
                           false,
                           LocationProvider.of(context, listen: false)
@@ -340,31 +338,31 @@ class _NewTripState extends State<NewTrip> {
                               .location),
                     )
                   : ListTile(
-                      leading: Icon(Icons.location_on_outlined),
+                      leading: const Icon(Icons.location_on_outlined),
                       title: Text(
                         to!.mainText,
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Row(
                         children: [
-                          Text(
+                          const Text(
                             'To',
                             style: TextStyle(color: Colors.green),
                           ),
                           Container(
-                              margin: EdgeInsets.symmetric(horizontal: 5),
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
                               width: 3,
                               height: 3,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Theme.of(context)
                                           .textTheme
-                                          .bodyText1
+                                          .bodyLarge
                                           ?.color ??
                                       Colors.white)),
                           Text(to!.secondaryText,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 12))
+                              style: const TextStyle(fontSize: 12))
                         ],
                       ),
                       onTap: () => autocompleteAddress(
@@ -373,7 +371,7 @@ class _NewTripState extends State<NewTrip> {
                               .currentAddress!
                               .location),
                     ),
-              Divider(height: 1),
+              const Divider(height: 1),
               SizedBox(
                   height: 80,
                   child: Row(
@@ -389,7 +387,7 @@ class _NewTripState extends State<NewTrip> {
                               Shimmer.fromColors(
                                   baseColor: Theme.of(context)
                                           .textTheme
-                                          .bodyText1!
+                                          .bodyLarge!
                                           .color ??
                                       Colors.black,
                                   highlightColor:
@@ -398,7 +396,7 @@ class _NewTripState extends State<NewTrip> {
                                     'Select destination... ',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .subtitle1
+                                        .titleMedium
                                         ?.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).hintColor),
@@ -408,14 +406,14 @@ class _NewTripState extends State<NewTrip> {
                                 tripDistanceText.isEmpty)
                               Text(
                                 'Calculating route ... ',
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                             if (from != null &&
                                 to != null &&
                                 tripDistanceText.isNotEmpty)
                               Text(
-                                'Trip distance: ${tripDistanceText}',
-                                style: Theme.of(context).textTheme.subtitle1,
+                                'Trip distance: $tripDistanceText',
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                           ],
                         ),
@@ -427,7 +425,7 @@ class _NewTripState extends State<NewTrip> {
                             onPressed: (tripDistanceText.isEmpty)
                                 ? null
                                 : () => startNewTrip(context),
-                            child: Row(children: [
+                            child: const Row(children: [
                               Icon(Icons.local_taxi),
                               SizedBox(width: 10),
                               Text('Order a taxi')
@@ -438,7 +436,7 @@ class _NewTripState extends State<NewTrip> {
             ]),
           )
         ],
-      )),
+      ),
     );
   }
 }

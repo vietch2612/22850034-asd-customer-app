@@ -33,7 +33,7 @@ class AddressSearch extends SearchDelegate<Prediction?> {
   Widget buildLeading(BuildContext context) {
     return IconButton(
       tooltip: 'Back',
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
       onPressed: () {
         close(context, null);
       },
@@ -60,26 +60,29 @@ class AddressSearch extends SearchDelegate<Prediction?> {
                 : apiGooglePlaces.autocomplete(query,
                     sessionToken: _sessionToken)),
         builder: (context, snapshot) {
-          final showMessage = (s) => Container(
-                padding: EdgeInsets.all(16.0),
+          showMessage(s) => Container(
+                padding: const EdgeInsets.all(16.0),
                 child: Text(s),
               );
 
           if (query == '') showMessage('Please enter address');
 
-          if (snapshot.hasError)
+          if (snapshot.hasError) {
             return showMessage(
                 'Error occured. ${snapshot.error?.toString() ?? ""}');
+          }
 
           if (!snapshot.hasData) return showMessage('Loading, please wait...');
 
-          if (snapshot.data?.hasNoResults ?? false)
+          if (snapshot.data?.hasNoResults ?? false) {
             return showMessage(
                 'Address not found. Please refine your search criteria.');
+          }
 
-          if (!(snapshot.data?.isOkay ?? false))
+          if (!(snapshot.data?.isOkay ?? false)) {
             return showMessage(
                 'API Error status: ${snapshot.data?.status ?? ""}.  ${snapshot.data?.errorMessage ?? ""}');
+          }
 
           return ListView.builder(
             itemBuilder: (context, index) {

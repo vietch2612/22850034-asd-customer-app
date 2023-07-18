@@ -19,10 +19,11 @@ Widget tripFinishedScaffold(BuildContext context) {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 30),
             child: Text(getTripStatusDescription(trip.activeTrip!.status),
-                style: Theme.of(context).textTheme.headline5),
+                style: Theme.of(context).textTheme.headlineSmall),
           ),
           Lottie.asset('assets/lottie/taxi-driver.json'),
-          Text('Rate your trip', style: Theme.of(context).textTheme.subtitle1),
+          Text('Rate your trip',
+              style: Theme.of(context).textTheme.titleMedium),
           RatingBar.builder(
             initialRating: 3,
             minRating: 1,

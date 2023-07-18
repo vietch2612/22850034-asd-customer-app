@@ -1,6 +1,5 @@
 // 22850034 ASD Customer App Flutter
 
-import 'dart:async';
 import 'dart:core';
 import 'dart:io';
 
@@ -26,17 +25,17 @@ class AssetLoaderProvider with ChangeNotifier {
 
   Future<void> loadAssets() async {
     //TODO: a temporary hack, device pixel ratio does not work on some devices. to be fixed later
-    final img_platform = !kIsWeb && Platform.isAndroid ? "l" : "s";
+    final imgPlatform = !kIsWeb && Platform.isAndroid ? "l" : "s";
     _markerIconFrom = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 1),
-        'assets/markers/from_$img_platform.png',
+        const ImageConfiguration(devicePixelRatio: 1),
+        'assets/markers/from_$imgPlatform.png',
         mipmaps: false);
     _markerIconTo = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 1),
-        'assets/markers/to_$img_platform.png');
+        const ImageConfiguration(devicePixelRatio: 1),
+        'assets/markers/to_$imgPlatform.png');
     _markerIconTaxi = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 1),
-        'assets/markers/taxi_$img_platform.png');
+        const ImageConfiguration(devicePixelRatio: 1),
+        'assets/markers/taxi_$imgPlatform.png');
 
     notifyListeners();
   }

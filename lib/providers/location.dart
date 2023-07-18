@@ -35,9 +35,10 @@ class LocationProvider with ChangeNotifier {
       final p = await _determinePosition();
       final res = await apiGeocoding
           .searchByLocation(Location(lat: p.latitude, lng: p.longitude));
-      if (!res.isOkay)
+      if (!res.isOkay) {
         throw Exception(
             'Geocoding API error. Status: ${res.status} ${res.errorMessage ?? ""}');
+      }
       final f = res.results.first;
       final mainPart = (f.addressComponents.length / 2.0).floor();
 
