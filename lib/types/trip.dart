@@ -29,6 +29,7 @@ String getTripStatusDescription(ExTripStatus status) =>
     tripStatusDescriptions[status] ?? status.toString();
 
 class TripDataEntity {
+  String? tripId;
   final ResolvedAddress from;
   final ResolvedAddress to;
   final Polyline polyline;
@@ -39,7 +40,8 @@ class TripDataEntity {
   CameraPosition? cameraPosition;
 
   TripDataEntity(
-      {required this.from,
+      {this.tripId,
+      required this.from,
       required this.to,
       required this.polyline,
       required this.distanceMeters,

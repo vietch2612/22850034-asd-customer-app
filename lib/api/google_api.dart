@@ -8,7 +8,7 @@ import 'package:google_maps_webservice/directions.dart' as dir;
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 
 // const String _appleBundleId = "flutterbasetaxi.flutterbase.com";
-const String _googleMapsApiKey = "_FLUTTERBASETAXI_API_KEY_";
+const String _googleMapsApiKey = "AIzaSyCul75GyfXVnv0oI9llthQomcJ3x-lEWvo";
 // final _googleApiHeaders = {"x-ios-bundle-identifier": _appleBundleId};
 
 //Platform.environment['API_KEY']
@@ -17,23 +17,9 @@ const prodApiProxy =
     "https://europe-west2-flutterbasedotcom.cloudfunctions.net/FlutterbaseTaxiWebDemo";
 const googleApiProxy = "$prodApiProxy/__https__/maps.googleapis.com/maps/api";
 
-final apiGooglePlaces = GoogleMapsPlaces(
-  apiKey: _googleMapsApiKey,
-  // apiHeaders: _googleApiHeaders,
-  baseUrl: googleApiProxy,
-);
-
-final apiGeocoding = GoogleMapsGeocoding(
-  apiKey: _googleMapsApiKey,
-  //apiHeaders: _googleApiHeaders,
-  baseUrl: googleApiProxy,
-);
-
-final apiDirections = dir.GoogleMapsDirections(
-  apiKey: _googleMapsApiKey,
-  //apiHeaders: _googleApiHeaders,
-  baseUrl: googleApiProxy,
-);
+final apiGooglePlaces = GoogleMapsPlaces(apiKey: _googleMapsApiKey);
+final apiGeocoding = GoogleMapsGeocoding(apiKey: _googleMapsApiKey);
+final apiDirections = dir.GoogleMapsDirections(apiKey: _googleMapsApiKey);
 
 List<LatLng>? createPolylinePointsFromDirections(
     dir.DirectionsResponse response) {

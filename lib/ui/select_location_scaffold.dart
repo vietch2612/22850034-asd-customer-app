@@ -14,9 +14,10 @@ class LocationScaffold extends StatelessWidget {
   LocationScaffold({Key? key}) : super(key: key);
 
   final homeAddress = ResolvedAddress(
-      location: Location(lat: 40.748558, lng: -73.9879518),
-      mainText: "Empire State Building, New York",
-      secondaryText: "NY 10001, USA");
+      location: Location(lat: 10.8428625, lng: 106.8346228),
+      mainText: "Vinhomes Grand Park - Origami S7.01",
+      secondaryText:
+          "RRVP+4VW, Long Bình, Hồ Chí Minh, Thành phố Hồ Chí Minh, Vietnam");
 
   void _setDemoLocation(BuildContext context, ResolvedAddress address) {
     final locProvider = LocationProvider.of(context, listen: false);
@@ -67,7 +68,7 @@ class LocationScaffold extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 64, top: 8),
               child: Text(
-                "Customer Taxi App",
+                "HCMUS CAB",
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
@@ -75,7 +76,7 @@ class LocationScaffold extends StatelessWidget {
             Expanded(child: Lottie.asset('assets/lottie/taxi-animation.json')),
             if (pendingDetermineLocation) ...[
               const LinearProgressIndicator(),
-              const Text('Please wait while your prosition is determined....'),
+              const Text('Finding your location...'),
             ],
             if (!pendingDetermineLocation) ...[
               Text(

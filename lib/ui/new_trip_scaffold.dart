@@ -2,6 +2,8 @@
 
 import 'dart:math';
 
+import 'package:customer_app/api/backend_api.dart';
+import 'package:customer_app/servivces/formatter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:customer_app/api/google_api.dart';
 import 'package:customer_app/types/resolved_address.dart';
@@ -38,11 +40,15 @@ class _NewTripState extends State<NewTrip> {
   Polyline? tripPolyline;
   int tripDistanceMeters = 0;
   String tripDistanceText = '';
+  int tripFare = 0;
+  String tripFareText = '';
 
   Future<void> recalcRoute() async {
     tripPolyline = null;
     tripDistanceText = '';
     tripDistanceMeters = 0;
+    tripFare = 0;
+    tripFareText = '';
 
     if (from == null || to == null) {
       return;
@@ -61,6 +67,9 @@ class _NewTripState extends State<NewTrip> {
 
         if (mounted) setState(() {});
       }
+
+      tripFare = await ApiService.calculateTripFare(tripDistanceMeters);
+      tripFareText = await formatCurrency(tripFare);
 
       final polylinePoints = createPolylinePointsFromDirections(response)!;
 
@@ -181,7 +190,7 @@ class _NewTripState extends State<NewTrip> {
     }
   }
 
-  void startNewTrip(BuildContext context) {
+  void startNewTrip(BuildContext context) async {
     final newTrip = TripDataEntity(
         from: from!,
         to: to!,
@@ -412,7 +421,7 @@ class _NewTripState extends State<NewTrip> {
                                 to != null &&
                                 tripDistanceText.isNotEmpty)
                               Text(
-                                'Trip distance: $tripDistanceText',
+                                '$tripDistanceText, Fare: $tripFareText',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                           ],
@@ -428,7 +437,7 @@ class _NewTripState extends State<NewTrip> {
                             child: const Row(children: [
                               Icon(Icons.local_taxi),
                               SizedBox(width: 10),
-                              Text('Order a taxi')
+                              Text('Book')
                             ])),
                       )
                     ],
