@@ -31,7 +31,15 @@ class NewTrip extends StatefulWidget {
   _NewTripState createState() => _NewTripState();
 }
 
+class MapBoundsNotifier extends ChangeNotifier {
+  void updateBounds() {
+    notifyListeners();
+  }
+}
+
 class _NewTripState extends State<NewTrip> {
+  final MapBoundsNotifier mapBoundsNotifier = MapBoundsNotifier();
+
   LatLngBounds? cameraViewportLatLngBounds;
 
   ResolvedAddress? from;
@@ -143,6 +151,7 @@ class _NewTripState extends State<NewTrip> {
         );
       });
     }
+    mapBoundsNotifier.updateBounds();
   }
 
   bool isDarkMapThemeSelected = false;
@@ -200,8 +209,8 @@ class _NewTripState extends State<NewTrip> {
         mapLatLngBounds: _mapCameraViewBounds!,
         cameraPosition: _latestCameraPosition);
 
-    final demoTripWorkflow = TripProvider.of(context, listen: false);
-    demoTripWorkflow.activateTrip(newTrip);
+    final trip = TripProvider.of(context, listen: false);
+    trip.activateTrip(newTrip);
   }
 
   BitmapDescriptor? fromMarker;
@@ -217,8 +226,6 @@ class _NewTripState extends State<NewTrip> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-
     final isDark = ThemeProvider.of(context, listen: false).isDark;
     if (isDark != isDarkMapThemeSelected && mapController != null) {
       mapController!.setMapStyle(ThemeProvider.of(context, listen: false).isDark

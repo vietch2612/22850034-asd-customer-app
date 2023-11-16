@@ -10,7 +10,7 @@ import GoogleMaps
   ) -> Bool {
 
     //TODO: Enter API key for the "Maps SDK for iOS"
-    GMSServices.provideAPIKey("AIzaSyCul75GyfXVnv0oI9llthQomcJ3x-lEWvo")
+    GMSServices.provideAPIKey("AIzaSyDtB1MH9LamNQQgmM23wWqKYWCL33IQRDc")
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

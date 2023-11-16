@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:touch_indicator/touch_indicator.dart';
 
@@ -17,6 +18,8 @@ import 'package:customer_app/ui/trip_finished_scaffold.dart';
 void main() async {
   // Load environment variables from .env file
   await dotenv.load();
+
+  var logger = Logger();
 
   runApp(MultiProvider(
     providers: [

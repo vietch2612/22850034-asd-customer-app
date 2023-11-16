@@ -3,83 +3,99 @@
 import 'package:flutter/material.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:customer_app/api/backend_api.dart';
-import 'package:customer_app/socket/socket_service.dart';
+import 'package:customer_app/servivces/map_service.dart';
+import 'package:customer_app/types/resolved_address.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
 import 'dart:convert';
 
 import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'package:google_maps_webservice/directions.dart' as dir;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final backendHost = dotenv.env['BACKEND_HOST'];
+final logger = Logger();
 
-// demo trip
 class TripProvider with ChangeNotifier {
-  void openSocketConnection(TripDataEntity trip,
-      {required Function(ExTripStatus) updateTripStatusCallback}) {
+  ExTripStatus get currentTripStatus {
+    return activeTrip?.status ?? ExTripStatus.allocated;
+  }
+
+  void openSocketConnection(TripDataEntity trip) {
     final socket = io.io('$backendHost', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });
 
     socket.on('connect', (_) {
-      final message = {"tripId": trip.tripId};
+      final tripId = trip.tripId;
+      final message = {"tripId": tripId};
       socket.emit('new_trip', jsonEncode(message));
+      logger.i('Started a new trip: $tripId');
     });
 
     socket.on('message', (data) {
-      print('Received message: $data');
+      logger.i('Received message: $data');
     });
 
     socket.on('finding_driver', (data) {
-      print('Received driver_found: $data');
+      logger.i('Received finding_driver: $data');
+      // Re-update the map
+      // remove the marker from the destination
+      // remove the line
+      notifyListeners();
     });
 
     socket.on('picking_up', (data) {
       setTripStatus(ExTripStatus.allocated);
-      print('Received picking_up: $data');
+
+      final driverLocation = getDriverLocation(data);
+      if (driverLocation != null) {
+        updateMapPoyline(activeTrip!.from, driverLocation);
+        taxiMarkerLatLng =
+            LatLng(driverLocation.location.lat, driverLocation.location.lng);
+      }
+
+      notifyListeners();
     });
 
     socket.on('driver_arrived', (data) {
       setTripStatus(ExTripStatus.arrived);
-      print('Received driver_arrived: $data');
+      logger.i('Received driver_arrived: $data');
+      notifyListeners();
     });
 
+    // Driver sends
     socket.on('in_transit', (data) {
+      logger.i('Received in_transit: $data');
+      // Update trip status to Driving
       setTripStatus(ExTripStatus.driving);
-      const drivingDuration = Duration(seconds: 15);
-      final drivingStartTime = DateTime.now();
-      final drivingEndTime = DateTime.now().add(drivingDuration);
-      completedStateTimer =
-          Timer(drivingDuration, () => setTripStatus(ExTripStatus.completed));
 
-      drivingProgressTimer =
-          Timer.periodic(const Duration(milliseconds: 300), (timer) {
-        final now = DateTime.now();
-        if (trip.status != ExTripStatus.driving ||
-            DateTime.now().compareTo(drivingEndTime) >= 0) {
-          timer.cancel();
-          return;
-        }
-        double drivingAnimationValue =
-            now.difference(drivingStartTime).inMilliseconds.toDouble() /
-                drivingDuration.inMilliseconds.toDouble();
-        taxiMarkerLatLng = getTaxiDrivePosition(drivingAnimationValue);
-        notifyListeners();
-      });
-      print('Received in_transit: $data');
+      final driverLocation = getDriverLocation(data);
+
+      if (driverLocation != null) {
+        // Re-update the polyline from taxi to the destination
+        updateMapPoyline(driverLocation, activeTrip!.to);
+
+        // Update the taxi maker
+        taxiMarkerLatLng =
+            LatLng(driverLocation.location.lat, driverLocation.location.lng);
+      }
+
+      notifyListeners();
     });
 
     socket.on('completed', (data) {
-      updateTripStatusCallback(ExTripStatus.completed);
-      print('Received completed: $data');
+      (ExTripStatus.completed);
+      logger.i('Received completed: $data');
       socket.disconnect();
     });
 
     socket.on('disconnect', (_) {
-      print('Socket disconnected');
+      logger.i('Socket disconnected');
     });
   }
 
@@ -102,8 +118,23 @@ class TripProvider with ChangeNotifier {
     return points[pointIndex];
   }
 
-  void updateTripStatusFromSocket(ExTripStatus newStatus) {
-    setTripStatus(newStatus);
+  ResolvedAddress? getDriverLocation(Map<String, dynamic> data) {
+    final Map<String, dynamic>? locationData =
+        data['location'] as Map<String, dynamic>?;
+
+    if (locationData != null) {
+      final double? latitude = locationData['lat'] as double?;
+      final double? longitude = locationData['long'] as double?;
+
+      if (latitude != null && longitude != null) {
+        return ResolvedAddress(
+            location: dir.Location(lat: latitude, lng: longitude),
+            mainText: "driver location",
+            secondaryText: "driver location");
+      }
+    }
+
+    return null;
   }
 
   void stopTripWorkflow() {
@@ -140,49 +171,19 @@ class TripProvider with ChangeNotifier {
   void activateTrip(TripDataEntity trip) {
     stopTripWorkflow();
     activeTrip = trip;
-    // Make API call to start the trip
     const String customerId = "022848e7-a724-4692-bb94-9f377a182fea";
     ApiService.createTrip(customerId, trip).then((tripId) {
       trip.tripId = tripId;
-      // Successful API call, start socket connection
-      openSocketConnection(trip,
-          updateTripStatusCallback: updateTripStatusFromSocket);
-
-      // allocatedStateTimer = Timer(const Duration(seconds: 1),
-      //     () => setTripStatus(ExTripStatus.allocated));
-      // arrivedStateTimer = Timer(const Duration(seconds: 2),
-      //     () => setTripStatus(ExTripStatus.arrived));
-      // const drivingDuration = Duration(seconds: 15);
-
-      // drivingStateTimer = Timer(const Duration(seconds: 3), () {
-      //   setTripStatus(ExTripStatus.driving);
-
-      //   final drivingStartTime = DateTime.now();
-      //   final drivingEndTime = DateTime.now().add(drivingDuration);
-      //   completedStateTimer =
-      //       Timer(drivingDuration, () => setTripStatus(ExTripStatus.completed));
-
-      //   drivingProgressTimer =
-      //       Timer.periodic(const Duration(milliseconds: 300), (timer) {
-      //     final now = DateTime.now();
-      //     if (trip.status != ExTripStatus.driving ||
-      //         DateTime.now().compareTo(drivingEndTime) >= 0) {
-      //       timer.cancel();
-      //       return;
-      //     }
-      //     double drivingAnimationValue =
-      //         now.difference(drivingStartTime).inMilliseconds.toDouble() /
-      //             drivingDuration.inMilliseconds.toDouble();
-      //     taxiMarkerLatLng = getTaxiDrivePosition(drivingAnimationValue);
-      //     notifyListeners();
-      //   });
-      // });
-
-      notifyListeners();
+      openSocketConnection(trip);
     }).catchError((apiError) {
-      // Handle API call error
-      print('Error starting trip (API): $apiError');
+      logger.e('Error starting trip (API): $apiError');
     });
+  }
+
+  void updateMapPoyline(ResolvedAddress from, ResolvedAddress to) async {
+    Polyline newPolyline = await MapHelper.getPolyline(from, to);
+    activeTrip?.polyline = newPolyline;
+    notifyListeners();
   }
 
   static TripProvider of(BuildContext context, {bool listen = true}) =>

@@ -32,7 +32,7 @@ class TripDataEntity {
   String? tripId;
   final ResolvedAddress from;
   final ResolvedAddress to;
-  final Polyline polyline;
+  Polyline polyline;
   final int distanceMeters;
   final String distanceText;
   ExTripStatus status;

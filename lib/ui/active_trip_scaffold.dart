@@ -99,28 +99,32 @@ class _ActiveTripState extends State<ActiveTrip> {
               zoomControlsEnabled: true,
               scrollGesturesEnabled: true,
               markers: {
-                Marker(
-                  icon: AssetLoaderProvider.of(context).markerIconFrom!,
-                  position: TripProvider.of(context).activeTrip!.from.toLatLng,
-                  //smooth marker update does not work on flutter web
-                  markerId: MarkerId(
-                      'fromMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
-                ),
-                Marker(
-                  icon: AssetLoaderProvider.of(context).markerIconTo,
-                  position: TripProvider.of(context).activeTrip!.to.toLatLng,
-                  //smooth marker update does not work on flutter web
-                  markerId: MarkerId(
-                      'toMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
-                ),
-                if (trip.isActive && trip.taxiMarkerLatLng != null)
+                if (trip.currentTripStatus != ExTripStatus.driving)
+                  Marker(
+                    icon: AssetLoaderProvider.of(context).markerIconFrom!,
+                    position:
+                        TripProvider.of(context).activeTrip!.from.toLatLng,
+                    markerId: MarkerId(
+                        'fromMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
+                  ),
+                if (trip.currentTripStatus != ExTripStatus.allocated &&
+                    trip.currentTripStatus != ExTripStatus.arrived)
+                  Marker(
+                    icon: AssetLoaderProvider.of(context).markerIconTo,
+                    position: TripProvider.of(context).activeTrip!.to.toLatLng,
+                    //smooth marker update does not work on flutter web
+                    markerId: MarkerId(
+                        'toMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
+                  ),
+                if ((trip.currentTripStatus == ExTripStatus.allocated ||
+                        trip.currentTripStatus == ExTripStatus.driving) &&
+                    trip.taxiMarkerLatLng != null)
                   Marker(
                     icon: AssetLoaderProvider.of(context).markerIconTaxi,
                     position: TripProvider.of(context).taxiMarkerLatLng!,
-                    //smooth marker update does not work on flutter web
                     markerId: MarkerId(
                         'taxiMarker ${kIsWeb ? DateTime.now().toIso8601String() : ''}'),
-                  )
+                  ),
               },
               polylines: <Polyline>{trip.activeTrip!.polyline},
               onMapCreated: (GoogleMapController controller) {
