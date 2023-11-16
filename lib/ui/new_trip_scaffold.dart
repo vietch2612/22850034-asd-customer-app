@@ -1,7 +1,6 @@
 // 22850034 ASD Customer App Flutter
 
 import 'dart:math';
-
 import 'package:customer_app/api/backend_api.dart';
 import 'package:customer_app/servivces/formatter.dart';
 import 'package:flutter/foundation.dart';
@@ -16,12 +15,9 @@ import 'package:customer_app/ui/common.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/providers/theme.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'dart:async';
 import 'package:google_maps_webservice/directions.dart' as dir;
-
 import 'package:google_maps_webservice/places.dart';
-
 import 'package:shimmer/shimmer.dart';
 
 class NewTrip extends StatefulWidget {
@@ -31,15 +27,7 @@ class NewTrip extends StatefulWidget {
   _NewTripState createState() => _NewTripState();
 }
 
-class MapBoundsNotifier extends ChangeNotifier {
-  void updateBounds() {
-    notifyListeners();
-  }
-}
-
 class _NewTripState extends State<NewTrip> {
-  final MapBoundsNotifier mapBoundsNotifier = MapBoundsNotifier();
-
   LatLngBounds? cameraViewportLatLngBounds;
 
   ResolvedAddress? from;
