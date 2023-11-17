@@ -60,11 +60,11 @@ void main() async {
                   // show Rate the Trip screen
                   ? tripFinishedScaffold(context)
                   // if not finished - show the trip in progress screen
-                  : const ActiveTrip();
+                  : const ActiveTrip(); // Change here to use ActiveTrip instead of const ActiveTrip()
             }
 
             // else if there is no active trip - display UI for new trip creation
-            return const NewTrip();
+            return NewTrip(tripProvider: currentTrip); // Pass the tripProvider
           },
         ),
       ),

@@ -21,7 +21,9 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:shimmer/shimmer.dart';
 
 class NewTrip extends StatefulWidget {
-  const NewTrip({Key? key}) : super(key: key);
+  final TripProvider tripProvider;
+
+  const NewTrip({Key? key, required this.tripProvider}) : super(key: key);
 
   @override
   _NewTripState createState() => _NewTripState();
@@ -139,7 +141,62 @@ class _NewTripState extends State<NewTrip> {
         );
       });
     }
-    mapBoundsNotifier.updateBounds();
+  }
+
+  void adjustMapViewBoundsByLocation(LatLng from, LatLng to) {
+    if (!mounted) return;
+
+    //0.001 ~= 100 m
+    const double deltaLatLngPointBound = 0.0015;
+    double minx = 180, miny = 180, maxx = -180, maxy = -180;
+
+    if (from!.latitude == to!.latitude && from!.longitude == to!.longitude) {
+      double lat = from.latitude;
+      double lng = from.longitude;
+      minx = lng - deltaLatLngPointBound;
+      maxx = lng + deltaLatLngPointBound;
+      miny = lat - deltaLatLngPointBound;
+      maxy = lat + deltaLatLngPointBound;
+
+      if (minx < -180) minx = -180;
+      if (miny < -90) miny = -90;
+      if (maxx > 180) minx = 180;
+      if (maxy > 90) maxy = 90;
+    } else {
+      for (var p in [
+        from,
+        to,
+        if (tripPolyline != null) ...tripPolyline!.points
+      ]) {
+        minx = min(minx, p.longitude);
+        maxx = max(maxx, p.longitude);
+
+        miny = min(miny, p.latitude);
+        maxy = max(maxy, p.latitude);
+      }
+    }
+
+    final newCameraViewBounds = LatLngBounds(
+      northeast: LatLng(maxy, maxx),
+      southwest: LatLng(miny, minx),
+    );
+    if (_mapCameraViewBounds == null ||
+        _mapCameraViewBounds != newCameraViewBounds) {
+      _mapCameraViewBounds = newCameraViewBounds;
+
+      if (mapControllerCompleter.isCompleted == false) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _mapCameraViewBounds == null) return;
+
+        mapController!.animateCamera(
+          CameraUpdate.newLatLngBounds(
+            _mapCameraViewBounds!,
+            30,
+          ),
+        );
+      });
+    }
   }
 
   bool isDarkMapThemeSelected = false;
@@ -277,6 +334,15 @@ class _NewTripState extends State<NewTrip> {
                             : googleMapDefaultStyle);
                     isDarkMapThemeSelected = isDark;
                   }
+                  widget.tripProvider.setMapViewBoundsCallback(
+                    (LatLng driverLocation, LatLng passengerLocation) {
+                      // Call the adjustMapViewBounds method with driver and passenger locations
+                      adjustMapViewBoundsByLocation(
+                          driverLocation, passengerLocation);
+
+                      logger.d("mapViewBounds");
+                    },
+                  );
                   setState(() {});
                 }
               },

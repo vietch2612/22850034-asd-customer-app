@@ -17,14 +17,32 @@ import 'package:google_maps_webservice/directions.dart' as dir;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final backendHost = dotenv.env['BACKEND_HOST'];
-final logger = Logger();
+var logger = Logger(
+  printer: PrettyPrinter(
+      methodCount: 0, // Number of method calls to be displayed
+      errorMethodCount: 8, // Number of method calls if stacktrace is provided
+      lineLength: 120, // Width of the output
+      colors: true, // Colorful log messages
+      printEmojis: false, // Print an emoji for each log message
+      printTime: false // Should each log print contain a timestamp
+      ),
+);
+
+typedef MapViewBoundsCallback = void Function(
+    LatLng driverLocation, LatLng passengerLocation);
 
 class TripProvider with ChangeNotifier {
+  MapViewBoundsCallback? mapViewBoundsCallback;
+
+  void setMapViewBoundsCallback(MapViewBoundsCallback callback) {
+    mapViewBoundsCallback = callback;
+  }
+
   ExTripStatus get currentTripStatus {
     return activeTrip?.status ?? ExTripStatus.allocated;
   }
 
-  void openSocketConnection(TripDataEntity trip) {
+  void openSocketForNewTrip(TripDataEntity trip) {
     final socket = io.io('$backendHost', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
@@ -44,8 +62,9 @@ class TripProvider with ChangeNotifier {
     socket.on('finding_driver', (data) {
       logger.i('Received finding_driver: $data');
       // Re-update the map
-      // remove the marker from the destination
-      // remove the line
+      // Remove the marker from the destination
+      // Remove the line
+      // Adjust the view point
       notifyListeners();
     });
 
@@ -58,6 +77,11 @@ class TripProvider with ChangeNotifier {
         taxiMarkerLatLng =
             LatLng(driverLocation.location.lat, driverLocation.location.lng);
       }
+
+      mapViewBoundsCallback?.call(
+        taxiMarkerLatLng!,
+        activeTrip!.from.toLatLng,
+      );
 
       notifyListeners();
     });
@@ -79,7 +103,6 @@ class TripProvider with ChangeNotifier {
       if (driverLocation != null) {
         // Re-update the polyline from taxi to the destination
         updateMapPoyline(driverLocation, activeTrip!.to);
-
         // Update the taxi maker
         taxiMarkerLatLng =
             LatLng(driverLocation.location.lat, driverLocation.location.lng);
@@ -89,7 +112,8 @@ class TripProvider with ChangeNotifier {
     });
 
     socket.on('completed', (data) {
-      (ExTripStatus.completed);
+      setTripStatus(ExTripStatus.completed);
+      notifyListeners();
       logger.i('Received completed: $data');
       socket.disconnect();
     });
@@ -174,7 +198,7 @@ class TripProvider with ChangeNotifier {
     const String customerId = "022848e7-a724-4692-bb94-9f377a182fea";
     ApiService.createTrip(customerId, trip).then((tripId) {
       trip.tripId = tripId;
-      openSocketConnection(trip);
+      openSocketForNewTrip(trip);
     }).catchError((apiError) {
       logger.e('Error starting trip (API): $apiError');
     });
