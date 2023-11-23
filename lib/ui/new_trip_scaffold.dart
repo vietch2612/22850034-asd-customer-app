@@ -334,15 +334,6 @@ class _NewTripState extends State<NewTrip> {
                             : googleMapDefaultStyle);
                     isDarkMapThemeSelected = isDark;
                   }
-                  widget.tripProvider.setMapViewBoundsCallback(
-                    (LatLng driverLocation, LatLng passengerLocation) {
-                      // Call the adjustMapViewBounds method with driver and passenger locations
-                      adjustMapViewBoundsByLocation(
-                          driverLocation, passengerLocation);
-
-                      logger.d("mapViewBounds");
-                    },
-                  );
                   setState(() {});
                 }
               },

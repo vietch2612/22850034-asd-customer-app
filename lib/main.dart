@@ -1,9 +1,12 @@
+// Project: Flutter-base Taxi
+// Purpose: Testing integration of Flutter & Google Maps
+// Platforms:  Web, iOS and Android
+// Authors: www.flutterbase.com
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:touch_indicator/touch_indicator.dart';
-
 import 'package:customer_app/types/trip.dart';
 import 'package:customer_app/ui/active_trip_scaffold.dart';
 import 'package:customer_app/providers/assets_loader.dart';
@@ -18,8 +21,6 @@ import 'package:customer_app/ui/trip_finished_scaffold.dart';
 void main() async {
   // Load environment variables from .env file
   await dotenv.load();
-
-  var logger = Logger();
 
   runApp(MultiProvider(
     providers: [

@@ -13,6 +13,48 @@ import 'package:shimmer/shimmer.dart';
 
 Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
     Column(children: [
+      if (tripData.driverInfo != null)
+        ListTile(
+            leading: CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(tripData.driverInfo!.avatarUrl),
+            ),
+            title: Text(
+              tripData.driverInfo!.name,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Row(children: [
+              Text(
+                tripData.driverInfo!.phoneNumber,
+                style: const TextStyle(color: Colors.green),
+              ),
+              Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  width: 3,
+                  height: 3,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white)),
+              Text(
+                  "${tripData.driverInfo!.licensePlate} ${tripData.driverInfo!.carInfo}",
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12)),
+              const SizedBox(width: 5), // Adjust spacing
+              Row(
+                children: [
+                  const Icon(
+                    Icons.star,
+                    color: Colors.yellow,
+                    size: 18,
+                  ),
+                  Text(
+                    "${tripData.driverInfo!.rating}/5",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ])),
       ListTile(
           leading: const Icon(Icons.person_pin_circle),
           title: Text(
