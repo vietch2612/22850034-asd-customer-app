@@ -27,7 +27,7 @@ Widget mainDrawer(BuildContext context, {bool isLoggedIn = true}) => Drawer(
                             Lottie.asset('assets/lottie/taxi-animation.json')),
                   ),
                   Text(
-                    "Flutterbase Taxi",
+                    "HCMUSCab Driver",
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge

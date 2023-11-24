@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:customer_app/types/resolved_address.dart';
 import 'package:customer_app/types/trip.dart';
+import 'package:logger/logger.dart';
 
 final backendHost = dotenv.env['BACKEND_HOST'];
+final logger = Logger();
 
 class ApiService {
   static Future<String> createTrip(
@@ -49,19 +50,20 @@ class ApiService {
   }
 
   static Future<int> calculateTripFare(int tripDistance) async {
-    const String calculateFareEndpoint = '/api/trip/calculate-fare';
+    const String calculateFareEndpoint = '/api/trips/calculate-fare';
 
     int fare = 0;
 
     try {
       final Map<String, dynamic> requestBody = {
-        'tripLength': tripDistance,
+        'length': tripDistance,
       };
 
       final http.Response response = await http.post(
         Uri.parse('$backendHost$calculateFareEndpoint'),
         headers: <String, String>{
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer your_placeholder_token'
         },
         body: jsonEncode(requestBody),
       );
@@ -70,7 +72,9 @@ class ApiService {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         fare = responseData['fare'];
       } else {}
-    } catch (error) {}
+    } catch (error) {
+      logger.e(error);
+    }
 
     return fare;
   }

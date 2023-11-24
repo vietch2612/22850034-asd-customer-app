@@ -20,6 +20,8 @@ import 'package:google_maps_webservice/directions.dart' as dir;
 import 'package:google_maps_webservice/places.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'package:logger/logger.dart';
+
 class NewTrip extends StatefulWidget {
   final TripProvider tripProvider;
 
@@ -143,62 +145,6 @@ class _NewTripState extends State<NewTrip> {
     }
   }
 
-  void adjustMapViewBoundsByLocation(LatLng from, LatLng to) {
-    if (!mounted) return;
-
-    //0.001 ~= 100 m
-    const double deltaLatLngPointBound = 0.0015;
-    double minx = 180, miny = 180, maxx = -180, maxy = -180;
-
-    if (from!.latitude == to!.latitude && from!.longitude == to!.longitude) {
-      double lat = from.latitude;
-      double lng = from.longitude;
-      minx = lng - deltaLatLngPointBound;
-      maxx = lng + deltaLatLngPointBound;
-      miny = lat - deltaLatLngPointBound;
-      maxy = lat + deltaLatLngPointBound;
-
-      if (minx < -180) minx = -180;
-      if (miny < -90) miny = -90;
-      if (maxx > 180) minx = 180;
-      if (maxy > 90) maxy = 90;
-    } else {
-      for (var p in [
-        from,
-        to,
-        if (tripPolyline != null) ...tripPolyline!.points
-      ]) {
-        minx = min(minx, p.longitude);
-        maxx = max(maxx, p.longitude);
-
-        miny = min(miny, p.latitude);
-        maxy = max(maxy, p.latitude);
-      }
-    }
-
-    final newCameraViewBounds = LatLngBounds(
-      northeast: LatLng(maxy, maxx),
-      southwest: LatLng(miny, minx),
-    );
-    if (_mapCameraViewBounds == null ||
-        _mapCameraViewBounds != newCameraViewBounds) {
-      _mapCameraViewBounds = newCameraViewBounds;
-
-      if (mapControllerCompleter.isCompleted == false) return;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _mapCameraViewBounds == null) return;
-
-        mapController!.animateCamera(
-          CameraUpdate.newLatLngBounds(
-            _mapCameraViewBounds!,
-            30,
-          ),
-        );
-      });
-    }
-  }
-
   bool isDarkMapThemeSelected = false;
   List<Marker> mapRouteMarkers = List.empty(growable: true);
   List<Marker> avaliableTaxiMarkers = List.empty(growable: true);
@@ -252,7 +198,9 @@ class _NewTripState extends State<NewTrip> {
         distanceMeters: tripDistanceMeters,
         distanceText: tripDistanceText,
         mapLatLngBounds: _mapCameraViewBounds!,
-        cameraPosition: _latestCameraPosition);
+        cameraPosition: _latestCameraPosition,
+        fare: tripFare,
+        distance: tripDistanceMeters);
 
     final trip = TripProvider.of(context, listen: false);
     trip.activateTrip(newTrip);
@@ -375,7 +323,7 @@ class _NewTripState extends State<NewTrip> {
                                     Colors.white)),
                     Text(from?.secondaryText ?? "",
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12))
+                        style: const TextStyle(fontSize: 10))
                   ],
                 ),
                 onTap: () => autocompleteAddress(
@@ -422,8 +370,8 @@ class _NewTripState extends State<NewTrip> {
                                           ?.color ??
                                       Colors.white)),
                           Text(to!.secondaryText,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12))
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(fontSize: 10))
                         ],
                       ),
                       onTap: () => autocompleteAddress(
@@ -454,7 +402,7 @@ class _NewTripState extends State<NewTrip> {
                                   highlightColor:
                                       Theme.of(context).colorScheme.secondary,
                                   child: Text(
-                                    'Select destination... ',
+                                    'Vui lòng chọn điểm đến',
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
@@ -466,30 +414,30 @@ class _NewTripState extends State<NewTrip> {
                                 to != null &&
                                 tripDistanceText.isEmpty)
                               Text(
-                                'Calculating route ... ',
+                                'Đang tính toán quãng đường',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             if (from != null &&
                                 to != null &&
                                 tripDistanceText.isNotEmpty)
                               Text(
-                                '$tripDistanceText, Fare: $tripFareText',
+                                '$tripDistanceText, $tripFareText',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                           ],
                         ),
                       )),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: ElevatedButton(
                             style: ThemeProvider.of(context).roundButtonStyle,
                             onPressed: (tripDistanceText.isEmpty)
                                 ? null
                                 : () => startNewTrip(context),
                             child: const Row(children: [
-                              Icon(Icons.local_taxi),
+                              Icon(Icons.taxi_alert),
                               SizedBox(width: 10),
-                              Text('Book')
+                              Text('Đặt xe')
                             ])),
                       )
                     ],

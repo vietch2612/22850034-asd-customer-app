@@ -1,4 +1,4 @@
-package com.flutterbase.flutterbasetaxi
+package com.hcmuscab.hcmuscabcustomer
 
 import io.flutter.embedding.android.FlutterActivity
 

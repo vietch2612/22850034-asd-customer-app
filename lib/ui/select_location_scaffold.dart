@@ -16,14 +16,11 @@ class LocationScaffold extends StatelessWidget {
   final homeAddress = ResolvedAddress(
       location: Location(lat: 10.8428625, lng: 106.8346228),
       mainText: "Vinhomes Grand Park - Origami S7.01",
-      secondaryText:
-          "RRVP+4VW, Long Bình, Hồ Chí Minh, Thành phố Hồ Chí Minh, Vietnam");
+      secondaryText: "Long Bình, Hồ Chí Minh, VN");
 
   void _setDemoLocation(BuildContext context, ResolvedAddress address) {
     final locProvider = LocationProvider.of(context, listen: false);
     locProvider.currentAddress = address;
-    showScaffoldSnackBarMessage(
-        '${address.mainText} was set as a current location.');
   }
 
   void _selectCurrentLocation(BuildContext context) async {
@@ -46,13 +43,9 @@ class LocationScaffold extends StatelessWidget {
               placeDetails.result.addressComponents.join(','),
           secondaryText: prd.structuredFormatting?.secondaryText ?? '');
 
+      // ignore: use_build_context_synchronously
       final locProvider = LocationProvider.of(context, listen: false);
       locProvider.currentAddress = address;
-      showScaffoldSnackBarMessage(
-          '${address.mainText} was set as a current location.');
-
-      showScaffoldSnackBarMessage(
-          placeDetails.result.geometry?.location.lat.toString() ?? "");
     }
   }
 
