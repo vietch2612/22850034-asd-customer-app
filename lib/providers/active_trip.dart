@@ -1,7 +1,10 @@
 // 22850034 ASD Customer App Flutter
 
+import 'dart:math';
+
 import 'package:customer_app/socket/socket_service.dart';
 import 'package:customer_app/types/driver_info.dart';
+import 'package:customer_app/types/resolved_address.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'dart:convert';
+import 'package:customer_app/servivces/map_service.dart';
 
 final backendHost = dotenv.env['BACKEND_HOST'];
 
@@ -23,7 +27,16 @@ var logger = Logger(
       printTime: false),
 );
 
+typedef MapViewBoundsCallback = void Function(
+    LatLng driverLocation, LatLng passengerLocation);
+
 class TripProvider with ChangeNotifier {
+  MapViewBoundsCallback? mapViewBoundsCallback;
+
+  void setMapViewBoundsCallback(MapViewBoundsCallback callback) {
+    mapViewBoundsCallback = callback;
+  }
+
   ExTripStatus get currentTripStatus {
     return activeTrip?.status ?? ExTripStatus.allocated;
   }
@@ -50,8 +63,8 @@ class TripProvider with ChangeNotifier {
     });
 
     /** Found a driver */
-    socket.on('trip_driver_allocate', (data) {
-      logger.i('The server has received! Finding driver!');
+    socket.on('trip_driver_allocate', (data) async {
+      logger.i('allocated');
       setTripStatus(ExTripStatus.allocated);
 
       final DriverInfo driverInfo = DriverInfo.fromJson(data);
@@ -59,14 +72,23 @@ class TripProvider with ChangeNotifier {
       activeTrip?.driverInfo = driverInfo;
       taxiMarkerLatLng = LatLng(driverInfo.currentLocation.location.lat,
           driverInfo.currentLocation.location.lng);
+      updateMapPoyline(driverInfo.currentLocation, activeTrip!.from);
+      mapViewBoundsCallback?.call(taxiMarkerLatLng!, activeTrip!.from.toLatLng);
 
       notifyListeners();
     });
 
-    /** The driver has arrived at the passenger location */
-    socket.on('arrived', (data) {
-      // logger.i('[$tripId] Driver has arrived!');
-      setTripStatus(ExTripStatus.arrived);
+    socket.on('trip_driver_driving', (data) async {
+      logger.i('Driving', data);
+      setTripStatus(ExTripStatus.driving);
+
+      final DriverInfo driverInfo = DriverInfo.fromJson(data);
+
+      activeTrip?.driverInfo = driverInfo;
+      taxiMarkerLatLng = LatLng(driverInfo.currentLocation.location.lat,
+          driverInfo.currentLocation.location.lng);
+      updateMapPoyline(driverInfo.currentLocation, activeTrip!.to);
+      mapViewBoundsCallback?.call(taxiMarkerLatLng!, activeTrip!.to.toLatLng);
 
       notifyListeners();
     });
@@ -84,10 +106,18 @@ class TripProvider with ChangeNotifier {
       taxiMarkerLatLng = LatLng(driverInfo.currentLocation.location.lat,
           driverInfo.currentLocation.location.lng);
 
+      //       if (driverLocation != null) {
+      //   // Re-update the polyline from taxi to the destination
+      //   updateMapPoyline(driverLocation, activeTrip!.to);
+      //   // Update the taxi maker
+      //   taxiMarkerLatLng =
+      //       LatLng(driverLocation.location.lat, driverLocation.location.lng);
+      // }
+
       notifyListeners();
     });
 
-    socket.on('completed', (data) {
+    socket.on('trip_driver_completed', (data) {
       setTripStatus(ExTripStatus.completed);
       notifyListeners();
       socket.disconnect();
@@ -135,6 +165,12 @@ class TripProvider with ChangeNotifier {
     stopTripWorkflow();
     activeTrip = trip;
     openSocketForNewTrip(trip);
+  }
+
+  void updateMapPoyline(ResolvedAddress from, ResolvedAddress to) async {
+    Polyline newPolyline = await MapHelper.getPolyline(from, to);
+    activeTrip?.polyline = newPolyline;
+    notifyListeners();
   }
 
   static TripProvider of(BuildContext context, {bool listen = true}) =>

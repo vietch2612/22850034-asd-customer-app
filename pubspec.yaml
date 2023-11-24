@@ -49,4 +49,5 @@ flutter:
   assets:
     - assets/markers/
     - assets/lottie/
+    - assets/logo/
     - .env

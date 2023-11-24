@@ -244,7 +244,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                                 onPressed: pendingUpdate
                                     ? null
                                     : () => trip.cancelTrip(),
-                                child: const Text('Cancel Order')),
+                                child: const Text('Huỷ')),
                           )
                         ],
                       )),

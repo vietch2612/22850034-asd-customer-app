@@ -66,25 +66,25 @@ class LocationScaffold extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            Expanded(child: Lottie.asset('assets/lottie/taxi-animation.json')),
+            Expanded(child: Image.asset('assets/logo/logo.png')),
             if (pendingDetermineLocation) ...[
               const LinearProgressIndicator(),
               const Text('Finding your location...'),
             ],
             if (!pendingDetermineLocation) ...[
               Text(
-                'Select your location',
+                'Vui lòng chọn điểm đón',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               ListTile(
-                leading: const Icon(Icons.home),
+                leading: const Icon(Icons.favorite),
                 title: const Text('S701 Vinhomes Grand Park'),
                 subtitle: const Text("Long Binh, Thu Duc City"),
                 onTap: () => _setDemoLocation(context, homeAddress),
                 trailing: const Icon(Icons.chevron_right),
               ),
               ListTile(
-                leading: const Icon(Icons.business),
+                leading: const Icon(Icons.school),
                 title: const Text('HCMUS'),
                 subtitle:
                     const Text("225 Nguyen Van Cu, Ward 5, Ho Chi Minh City"),
@@ -94,12 +94,12 @@ class LocationScaffold extends StatelessWidget {
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.search),
-                title: const Text('Search address'),
+                title: const Text('Tìm địa chỉ'),
                 onTap: () => _selectCurrentLocation(context),
               ),
               ListTile(
                 leading: const Icon(Icons.gps_fixed),
-                title: const Text('Use my current location by GPS'),
+                title: const Text('Sử dụng toạ độ hiện tại'),
                 onTap: () => LocationProvider.of(context, listen: false)
                     .determineCurrentLocation(),
               )

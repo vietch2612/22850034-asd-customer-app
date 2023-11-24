@@ -22,7 +22,7 @@ Widget tripFinishedScaffold(BuildContext context) {
                 style: Theme.of(context).textTheme.headlineSmall),
           ),
           Lottie.asset('assets/lottie/taxi-driver.json'),
-          Text('Rate your trip',
+          Text('Vui lòng đánh giá về chuyến đi',
               style: Theme.of(context).textTheme.titleMedium),
           RatingBar.builder(
             initialRating: 3,
@@ -46,7 +46,7 @@ Widget tripFinishedScaffold(BuildContext context) {
             child: ElevatedButton(
                 style: ThemeProvider.of(context).roundButtonStyle,
                 onPressed: () => trip.deactivateTrip(),
-                child: const Text('Close')),
+                child: const Text('Hoàn thành')),
           )
         ],
       )));

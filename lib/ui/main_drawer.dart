@@ -5,7 +5,6 @@ import 'package:customer_app/providers/active_trip.dart';
 import 'package:customer_app/providers/location.dart';
 import 'package:customer_app/providers/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:lottie/lottie.dart';
 
 Widget mainDrawer(BuildContext context, {bool isLoggedIn = true}) => Drawer(
       child: ListView(
@@ -22,9 +21,7 @@ Widget mainDrawer(BuildContext context, {bool isLoggedIn = true}) => Drawer(
                 children: [
                   SizedBox(
                     height: 100,
-                    child: Expanded(
-                        child:
-                            Lottie.asset('assets/lottie/taxi-animation.json')),
+                    child: Expanded(child: Image.asset('assets/logo/logo.png')),
                   ),
                   Text(
                     "HCMUSCab Driver",

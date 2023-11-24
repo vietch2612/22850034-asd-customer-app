@@ -22,13 +22,26 @@ import 'package:shimmer/shimmer.dart';
 
 import 'package:logger/logger.dart';
 
+final logger = Logger();
+
 class NewTrip extends StatefulWidget {
   final TripProvider tripProvider;
 
   const NewTrip({Key? key, required this.tripProvider}) : super(key: key);
 
+  Future<void> recalculateRoute() async {
+    await _newTripState?.recalcRoute(); // Use _newTripState instance
+  }
+
+  void initiateNewTrip(BuildContext context) {
+    _newTripState?.startNewTrip(context); // Use _newTripState instance
+  }
+
   @override
-  _NewTripState createState() => _NewTripState();
+  _NewTripState createState() {
+    _newTripState = _NewTripState();
+    return _newTripState!;
+  }
 }
 
 class _NewTripState extends State<NewTrip> {
@@ -86,6 +99,7 @@ class _NewTripState extends State<NewTrip> {
   LatLngBounds? _mapCameraViewBounds;
 
   void adjustMapViewBounds() {
+    logger.i('adjustMapViewBounds()');
     if (!mounted) return;
 
     //0.001 ~= 100 m
@@ -226,6 +240,7 @@ class _NewTripState extends State<NewTrip> {
           : googleMapDefaultStyle);
       isDarkMapThemeSelected = isDark;
     }
+    adjustMapViewBounds();
 
     super.didChangeDependencies();
   }
@@ -282,7 +297,9 @@ class _NewTripState extends State<NewTrip> {
                             : googleMapDefaultStyle);
                     isDarkMapThemeSelected = isDark;
                   }
-                  setState(() {});
+                  setState(() {
+                    adjustMapViewBounds();
+                  });
                 }
               },
             ),
@@ -309,7 +326,7 @@ class _NewTripState extends State<NewTrip> {
                 subtitle: Row(
                   children: [
                     const Text(
-                      'From',
+                      'Từ',
                       style: TextStyle(color: Colors.green),
                     ),
                     Container(
@@ -355,7 +372,7 @@ class _NewTripState extends State<NewTrip> {
                       subtitle: Row(
                         children: [
                           const Text(
-                            'To',
+                            'Tới',
                             style: TextStyle(color: Colors.green),
                           ),
                           Container(
@@ -449,3 +466,5 @@ class _NewTripState extends State<NewTrip> {
     );
   }
 }
+
+_NewTripState? _newTripState;

@@ -15,12 +15,12 @@ enum ExTripStatus {
 }
 
 final tripStatusDescriptions = <ExTripStatus, String>{
-  ExTripStatus.submitted: "Order Submitted",
-  ExTripStatus.allocated: "Driver found",
-  ExTripStatus.arrived: "Driver arrived",
-  ExTripStatus.driving: "Driving...",
-  ExTripStatus.completed: "Order completed",
-  ExTripStatus.cancelled: "Order cancelled",
+  ExTripStatus.submitted: "Đang tìm xe",
+  ExTripStatus.allocated: "Đang tới",
+  ExTripStatus.arrived: "Xe đã tới",
+  ExTripStatus.driving: "Đang trên chuyến",
+  ExTripStatus.completed: "Đã hoàn thành",
+  ExTripStatus.cancelled: "Đã huỷ",
 };
 
 bool tripIsFinished(ExTripStatus status) =>
