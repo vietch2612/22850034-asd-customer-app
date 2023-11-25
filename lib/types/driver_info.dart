@@ -41,4 +41,20 @@ class DriverInfo {
       ),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'Driver': {
+        'id': id,
+        'avatarUrl': avatarUrl,
+        'rating': rating,
+        'DriverLocations': [
+          {
+            'lat': currentLocation.location.lat,
+            'long': currentLocation.location.lng,
+          },
+        ],
+      },
+    };
+  }
 }
