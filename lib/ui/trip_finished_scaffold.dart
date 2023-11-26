@@ -21,7 +21,7 @@ Widget tripFinishedScaffold(BuildContext context) {
             child: Text(getTripStatusDescription(trip.activeTrip!.status),
                 style: Theme.of(context).textTheme.headlineSmall),
           ),
-          Lottie.asset('assets/lottie/taxi-driver.json'),
+          Image.asset('assets/logo/logo.png'),
           Text('Vui lòng đánh giá về chuyến đi',
               style: Theme.of(context).textTheme.titleMedium),
           RatingBar.builder(

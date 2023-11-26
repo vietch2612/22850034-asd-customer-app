@@ -49,7 +49,8 @@ class ApiService {
     return tripId;
   }
 
-  static Future<int> calculateTripFare(int tripDistance) async {
+  static Future<int> calculateTripFare(
+      int tripDistance, int numberOfSeat, int serviceType) async {
     const String calculateFareEndpoint = '/api/trips/calculate-fare';
 
     int fare = 0;
@@ -57,6 +58,8 @@ class ApiService {
     try {
       final Map<String, dynamic> requestBody = {
         'length': tripDistance,
+        'numberOfSeat': numberOfSeat,
+        'serviceType': serviceType
       };
 
       final http.Response response = await http.post(

@@ -38,6 +38,7 @@ class NewTrip extends StatefulWidget {
   }
 
   @override
+  // ignore: no_logic_in_create_state, library_private_types_in_public_api
   _NewTripState createState() {
     _newTripState = _NewTripState();
     return _newTripState!;
@@ -55,6 +56,17 @@ class _NewTripState extends State<NewTrip> {
   String tripDistanceText = '';
   int tripFare = 0;
   String tripFareText = '';
+  int numberOfSeat = 4;
+  int serviceType = 0;
+  String selectedSeatType = '4 Chỗ';
+  String selectedServiceType = 'Tiết kiệm'; // 0 == Regular, 1 = VIP
+
+  // Calculate the fare
+  Future<void> calculateFare() async {
+    tripFare = await ApiService.calculateTripFare(
+        tripDistanceMeters, numberOfSeat, serviceType);
+    tripFareText = await formatCurrency(tripFare);
+  }
 
   Future<void> recalcRoute() async {
     tripPolyline = null;
@@ -81,8 +93,7 @@ class _NewTripState extends State<NewTrip> {
         if (mounted) setState(() {});
       }
 
-      tripFare = await ApiService.calculateTripFare(tripDistanceMeters);
-      tripFareText = await formatCurrency(tripFare);
+      calculateFare();
 
       final polylinePoints = createPolylinePointsFromDirections(response)!;
 
@@ -240,7 +251,6 @@ class _NewTripState extends State<NewTrip> {
           : googleMapDefaultStyle);
       isDarkMapThemeSelected = isDark;
     }
-    adjustMapViewBounds();
 
     super.didChangeDependencies();
   }
@@ -309,7 +319,7 @@ class _NewTripState extends State<NewTrip> {
               color: Theme.of(context).colorScheme.background,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Colors.black.withOpacity(0.5),
                   spreadRadius: 3,
                   blurRadius: 3,
                   offset: const Offset(0, -3), // changes position of shadow
@@ -325,10 +335,6 @@ class _NewTripState extends State<NewTrip> {
                 ),
                 subtitle: Row(
                   children: [
-                    const Text(
-                      'Từ',
-                      style: TextStyle(color: Colors.green),
-                    ),
                     Container(
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         width: 3,
@@ -340,7 +346,7 @@ class _NewTripState extends State<NewTrip> {
                                     Colors.white)),
                     Text(from?.secondaryText ?? "",
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 10))
+                        style: const TextStyle(fontSize: 8))
                   ],
                 ),
                 onTap: () => autocompleteAddress(
@@ -355,7 +361,7 @@ class _NewTripState extends State<NewTrip> {
               (to == null)
                   ? ListTile(
                       leading: const Icon(Icons.location_on_outlined),
-                      title: const Text('To...'),
+                      title: const Text('Điểm đến'),
                       subtitle: const Text(''),
                       onTap: () => autocompleteAddress(
                           false,
@@ -371,10 +377,6 @@ class _NewTripState extends State<NewTrip> {
                       ),
                       subtitle: Row(
                         children: [
-                          const Text(
-                            'Tới',
-                            style: TextStyle(color: Colors.green),
-                          ),
                           Container(
                               margin: const EdgeInsets.symmetric(horizontal: 5),
                               width: 3,
@@ -388,7 +390,7 @@ class _NewTripState extends State<NewTrip> {
                                       Colors.white)),
                           Text(to!.secondaryText,
                               overflow: TextOverflow.fade,
-                              style: const TextStyle(fontSize: 10))
+                              style: const TextStyle(fontSize: 8))
                         ],
                       ),
                       onTap: () => autocompleteAddress(
@@ -397,6 +399,78 @@ class _NewTripState extends State<NewTrip> {
                               .currentAddress!
                               .location),
                     ),
+              const Divider(height: 1),
+              SizedBox(
+                  height: 80,
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                            child: DropdownButton<String>(
+                          padding: const EdgeInsets.all(20.0),
+                          value: selectedSeatType,
+                          icon: const Icon(Icons.local_taxi),
+                          iconSize: 24,
+                          elevation: 16,
+                          style: const TextStyle(color: Colors.black),
+                          underline: Container(
+                            height: 0,
+                            color: Colors.transparent,
+                          ),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedSeatType =
+                                  newValue!; // Update the selected value
+                              if (newValue == "4 Chỗ") {
+                                numberOfSeat = 4;
+                              } else {
+                                numberOfSeat = 7;
+                              }
+                              calculateFare();
+                            });
+                          },
+                          items: <String>['4 Chỗ', '7 Chỗ']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        )),
+                        Expanded(
+                          child: DropdownButton<String>(
+                            padding: const EdgeInsets.all(20.0),
+                            value: selectedServiceType,
+                            icon: const Icon(Icons.currency_pound),
+                            iconSize: 24,
+                            elevation: 16,
+                            style: const TextStyle(color: Colors.black),
+                            underline: Container(
+                              height: 0,
+                              color: Colors.transparent,
+                            ),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedServiceType =
+                                    newValue!; // Update the selected value
+                                if (newValue == "Tiết kiệm") {
+                                  serviceType = 0;
+                                } else {
+                                  serviceType = 1;
+                                }
+                                calculateFare();
+                              });
+                            },
+                            items: <String>['Tiết kiệm', 'VIP']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                          ),
+                        )
+                      ])),
               const Divider(height: 1),
               SizedBox(
                   height: 80,

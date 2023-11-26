@@ -63,7 +63,7 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
           ),
           subtitle: Row(children: [
             const Text(
-              'From',
+              'Từ',
               style: TextStyle(color: Colors.green),
             ),
             Container(
@@ -86,7 +86,7 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
           ),
           subtitle: Row(children: [
             const Text(
-              'To',
+              'Tới',
               style: TextStyle(color: Colors.green),
             ),
             Container(
