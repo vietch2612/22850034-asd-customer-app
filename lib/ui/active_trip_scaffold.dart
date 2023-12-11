@@ -76,7 +76,7 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
                         Colors.white)),
             Text(tripData.from.secondaryText,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12))
+                style: const TextStyle(fontSize: 8))
           ])),
       ListTile(
           leading: const Icon(Icons.location_on_outlined),
@@ -99,7 +99,7 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
                         Colors.white)),
             Text(tripData.to.secondaryText,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12))
+                style: const TextStyle(fontSize: 8))
           ]))
     ]);
 
