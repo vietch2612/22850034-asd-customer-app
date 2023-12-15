@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:customer_app/api/google_api.dart';
 import 'package:customer_app/types/resolved_address.dart';
 import 'package:customer_app/types/trip.dart';
-import 'package:customer_app/ui/address_search.dart';
+import 'package:customer_app/ui/search_address.dart';
 import 'package:customer_app/providers/assets_loader.dart';
 import 'package:customer_app/providers/location.dart';
 import 'package:customer_app/providers/active_trip.dart';
@@ -57,7 +57,7 @@ class _NewTripState extends State<NewTrip> {
   int tripFare = 0;
   String tripFareText = '';
   int numberOfSeat = 4;
-  int serviceType = 0;
+  int serviceType = 1;
   String selectedSeatType = '4 Chỗ';
   String selectedServiceType = 'Tiết kiệm'; // 0 == Regular, 1 = VIP
 
@@ -66,6 +66,7 @@ class _NewTripState extends State<NewTrip> {
     tripFare = await ApiService.calculateTripFare(
         tripDistanceMeters, numberOfSeat, serviceType);
     tripFareText = await formatCurrency(tripFare);
+    if (mounted) setState(() {});
   }
 
   Future<void> recalcRoute() async {
@@ -454,9 +455,9 @@ class _NewTripState extends State<NewTrip> {
                                 selectedServiceType =
                                     newValue!; // Update the selected value
                                 if (newValue == "Tiết kiệm") {
-                                  serviceType = 0;
-                                } else {
                                   serviceType = 1;
+                                } else {
+                                  serviceType = 2;
                                 }
                                 calculateFare();
                               });

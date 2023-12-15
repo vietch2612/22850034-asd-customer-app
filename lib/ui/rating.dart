@@ -1,14 +1,11 @@
-// 22850034 ASD Customer App Flutter
-
 import 'package:flutter/material.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:customer_app/providers/active_trip.dart';
 import 'package:customer_app/ui/common.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:customer_app/providers/theme.dart';
-import 'package:lottie/lottie.dart';
 
-Widget tripFinishedScaffold(BuildContext context) {
+Widget tripRating(BuildContext context) {
   final trip = TripProvider.of(context);
 
   return buildAppScaffold(

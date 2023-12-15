@@ -1,14 +1,14 @@
 // 22850034 ASD Customer App Flutter
 
+import 'package:customer_app/global.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/api/google_api.dart';
 import 'package:customer_app/types/resolved_address.dart';
-import 'package:customer_app/ui/address_search.dart';
+import 'package:customer_app/ui/search_address.dart';
 import 'package:customer_app/providers/location.dart';
 import 'package:customer_app/ui/common.dart';
 
 import 'package:google_maps_webservice/places.dart';
-import 'package:lottie/lottie.dart';
 
 class LocationScaffold extends StatelessWidget {
   LocationScaffold({Key? key}) : super(key: key);
@@ -61,7 +61,7 @@ class LocationScaffold extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 64, top: 8),
               child: Text(
-                "HCMUS CAB",
+                "Xin chào khách hàng ${globalCustomer?.name}",
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
@@ -69,7 +69,7 @@ class LocationScaffold extends StatelessWidget {
             Expanded(child: Image.asset('assets/logo/logo.png')),
             if (pendingDetermineLocation) ...[
               const LinearProgressIndicator(),
-              const Text('Finding your location...'),
+              const Text('Đang tìm kiếm vị trí...'),
             ],
             if (!pendingDetermineLocation) ...[
               Text(

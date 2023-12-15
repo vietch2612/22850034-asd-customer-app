@@ -5,11 +5,21 @@ import 'package:customer_app/api/google_api.dart';
 import 'package:customer_app/types/resolved_address.dart';
 import 'package:customer_app/ui/common.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 
 class LocationProvider with ChangeNotifier {
+  var logger = Logger(
+    printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 8,
+        lineLength: 120,
+        colors: true,
+        printEmojis: false,
+        printTime: false),
+  );
   bool pendingDetermineCurrentLocation = false;
 
   ResolvedAddress? _currentAddress;
@@ -40,16 +50,24 @@ class LocationProvider with ChangeNotifier {
             'Geocoding API error. Status: ${res.status} ${res.errorMessage ?? ""}');
       }
       final f = res.results.first;
+      logger.i(res);
+
       final mainPart = (f.addressComponents.length / 2.0).floor();
 
+      // Convert address components to strings
+      final mainText = f.addressComponents.take(mainPart).map((component) {
+        return component.longName;
+      }).join(', ');
+
+      final secondaryText = f.addressComponents.skip(mainPart).map((component) {
+        return component.longName;
+      }).join(', ');
+
       currentAddress = ResolvedAddress(
-        mainText: f.addressComponents.take(mainPart).join(',').toString(),
-        secondaryText: f.addressComponents.skip(mainPart).join(',').toString(),
+        mainText: mainText,
+        secondaryText: secondaryText,
         location: f.geometry.location,
       );
-
-      showScaffoldSnackBarMessage(
-          '${currentAddress!.mainText} was set as a current location.');
     } catch (e) {
       showScaffoldSnackBarMessage(e.toString());
     } finally {
@@ -62,12 +80,8 @@ class LocationProvider with ChangeNotifier {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
@@ -75,23 +89,15 @@ class LocationProvider with ChangeNotifier {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
     final cp = await Geolocator.getCurrentPosition();
     return cp;
   }

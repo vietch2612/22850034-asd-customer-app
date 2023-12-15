@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'package:customer_app/global.dart';
+import 'package:customer_app/servivces/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:logger/logger.dart';
 
-final backendHost = dotenv.env['BACKEND_HOST'];
+final backendHost = dotenv.env['GATEWAY_HOST'];
 final logger = Logger();
 
 class ApiService {
@@ -23,8 +25,6 @@ class ApiService {
       'dropoffLong': trip.to.location.lng,
       'tripLength': trip.distanceMeters
     };
-
-    print(jsonEncode(requestBody));
 
     try {
       final response = await http.post(
@@ -49,6 +49,31 @@ class ApiService {
     return tripId;
   }
 
+  static void ratingTrip(tripId, rating) async {
+    final Map<String, dynamic> requestBody = {'rating': rating};
+
+    try {
+      final response = await http.post(
+        Uri.parse('$backendHost/api/trip/$tripId/rating'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authentication': 'Bearer ${globalCustomer?.token}'
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        tripId = responseData['tripId'];
+      } else {
+        throw Exception(
+            'Failed to rating trip. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      throw Exception('Error creating trip: $error');
+    }
+  }
+
   static Future<int> calculateTripFare(
       int tripDistance, int numberOfSeat, int serviceType) async {
     const String calculateFareEndpoint = '/api/trips/calculate-fare';
@@ -66,7 +91,7 @@ class ApiService {
         Uri.parse('$backendHost$calculateFareEndpoint'),
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer your_placeholder_token'
+          'Authorization': 'Bearer ${globalCustomer?.token}'
         },
         body: jsonEncode(requestBody),
       );

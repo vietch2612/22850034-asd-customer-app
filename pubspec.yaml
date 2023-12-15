@@ -36,6 +36,8 @@ dependencies:
   socket_io_client: ^2.0.0
   logger: ^1.0.0
 
+  shared_preferences: ^2.0.8
+
 dev_dependencies:
   chewie_audio: ^1.5.0
 
