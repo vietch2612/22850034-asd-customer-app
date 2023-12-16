@@ -1,7 +1,3 @@
-// 22850034 ASD Customer App Flutter
-
-import 'dart:math';
-
 import 'package:customer_app/socket/socket_service.dart';
 import 'package:customer_app/types/driver_info.dart';
 import 'package:customer_app/types/resolved_address.dart';
@@ -12,10 +8,11 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
-import 'dart:convert';
 import 'package:customer_app/servivces/map_service.dart';
 
 final backendHost = dotenv.env['BACKEND_HOST'];
+
+io.Socket? socket;
 
 var logger = Logger(
   printer: PrettyPrinter(
@@ -42,28 +39,26 @@ class TripProvider with ChangeNotifier {
   }
 
   void openSocketForNewTrip(TripDataEntity trip) {
-    final socket = io.io('$backendHost', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': true,
-    });
+    if (socket == null || socket!.disconnected) {
+      socket = io.io('$backendHost', <String, dynamic>{
+        'transports': ['websocket'],
+        'autoConnect': true,
+      });
+    }
 
-    socket.on('connect', (_) {
-      SocketService.submitTripToSocket(socket, trip);
-    });
-
-    socket.on('trip_passenger_submit', (data) {
+    socket!.on('trip_passenger_submit', (data) {
       logger.i("Received Trip passenger submit: ", data);
       activeTrip?.tripId = data['id'];
       setTripStatus(ExTripStatus.submitted);
       notifyListeners();
     });
 
-    socket.on('message', (data) {
+    socket!.on('message', (data) {
       logger.i('Received message: $data');
     });
 
     /** Found a driver */
-    socket.on('trip_driver_allocate', (data) async {
+    socket!.on('trip_driver_allocate', (data) async {
       logger.i('allocated');
       setTripStatus(ExTripStatus.allocated);
 
@@ -78,7 +73,7 @@ class TripProvider with ChangeNotifier {
       notifyListeners();
     });
 
-    socket.on('trip_driver_driving', (data) async {
+    socket!.on('trip_driver_driving', (data) async {
       logger.i('Driving', data);
       setTripStatus(ExTripStatus.driving);
 
@@ -93,37 +88,11 @@ class TripProvider with ChangeNotifier {
       notifyListeners();
     });
 
-    // Driver sends
-    socket.on('driving', (data) {
-      // logger.i('[$tripId] Driving!');
-      setTripStatus(ExTripStatus.driving);
-
-      final DriverInfo driverInfo =
-          DriverInfo.fromJson(jsonDecode(data)['driver']);
-
-      activeTrip?.driverInfo = driverInfo;
-
-      taxiMarkerLatLng = LatLng(driverInfo.currentLocation.location.lat,
-          driverInfo.currentLocation.location.lng);
-
-      //       if (driverLocation != null) {
-      //   // Re-update the polyline from taxi to the destination
-      //   updateMapPoyline(driverLocation, activeTrip!.to);
-      //   // Update the taxi maker
-      //   taxiMarkerLatLng =
-      //       LatLng(driverLocation.location.lat, driverLocation.location.lng);
-      // }
-
-      notifyListeners();
-    });
-
-    socket.on('trip_driver_completed', (data) {
+    socket!.on('trip_driver_completed', (data) {
       setTripStatus(ExTripStatus.completed);
+      stopTripWorkflow();
       notifyListeners();
-      socket.disconnect();
     });
-
-    socket.on('disconnect', (_) {});
   }
 
   TripDataEntity? activeTrip;
@@ -165,6 +134,7 @@ class TripProvider with ChangeNotifier {
     stopTripWorkflow();
     activeTrip = trip;
     openSocketForNewTrip(trip);
+    SocketService.submitTripToSocket(socket, trip);
   }
 
   void updateMapPoyline(ResolvedAddress from, ResolvedAddress to) async {

@@ -98,7 +98,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        fare = responseData['fare'];
+        fare = int.parse(responseData['fare']);
       } else {}
     } catch (error) {
       logger.e(error);

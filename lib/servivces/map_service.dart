@@ -30,11 +30,8 @@ class MapHelper {
     final polylinePoints = createPolylinePointsFromDirections(response);
 
     if (polylinePoints == null) {
-      // TODO Handle the case where polylinePoints is null.
       return temp;
     }
-
-    logger.i("All good ulti here!");
 
     return Polyline(
       polylineId: const PolylineId('polyline-1'),
