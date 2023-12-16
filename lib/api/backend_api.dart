@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:customer_app/global.dart';
-import 'package:customer_app/servivces/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:customer_app/types/trip.dart';

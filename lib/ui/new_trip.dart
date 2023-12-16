@@ -5,7 +5,7 @@ import 'package:customer_app/api/backend_api.dart';
 import 'package:customer_app/servivces/formatter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:customer_app/api/google_api.dart';
-import 'package:customer_app/types/resolved_address.dart';
+import 'package:customer_app/types/map_address.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:customer_app/ui/search_address.dart';
 import 'package:customer_app/providers/assets_loader.dart';
@@ -48,8 +48,8 @@ class NewTrip extends StatefulWidget {
 class _NewTripState extends State<NewTrip> {
   LatLngBounds? cameraViewportLatLngBounds;
 
-  ResolvedAddress? from;
-  ResolvedAddress? to;
+  MapAddress? from;
+  MapAddress? to;
 
   Polyline? tripPolyline;
   int tripDistanceMeters = 0;
@@ -196,7 +196,7 @@ class _NewTripState extends State<NewTrip> {
 
       if (!mounted) return;
 
-      final placeAddress = ResolvedAddress(
+      final placeAddress = MapAddress(
           location: placeDetails.result.geometry!.location,
           mainText: p.structuredFormatting?.mainText ??
               placeDetails.result.addressComponents.join(','),
@@ -238,21 +238,11 @@ class _NewTripState extends State<NewTrip> {
   @override
   void initState() {
     from = LocationProvider.of(context, listen: false).currentAddress;
-    isDarkMapThemeSelected = false;
-
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    final isDark = ThemeProvider.of(context, listen: false).isDark;
-    if (isDark != isDarkMapThemeSelected && mapController != null) {
-      mapController!.setMapStyle(ThemeProvider.of(context, listen: false).isDark
-          ? googleMapDarkStyle
-          : googleMapDefaultStyle);
-      isDarkMapThemeSelected = isDark;
-    }
-
     super.didChangeDependencies();
   }
 
@@ -302,11 +292,7 @@ class _NewTripState extends State<NewTrip> {
                   final isDark =
                       ThemeProvider.of(context, listen: false).isDark;
                   if (isDark != isDarkMapThemeSelected) {
-                    controller.setMapStyle(
-                        ThemeProvider.of(context, listen: false).isDark
-                            ? googleMapDarkStyle
-                            : googleMapDefaultStyle);
-                    isDarkMapThemeSelected = isDark;
+                    controller.setMapStyle(googleMapDefaultStyle);
                   }
                   setState(() {
                     adjustMapViewBounds();

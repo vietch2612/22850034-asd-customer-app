@@ -3,7 +3,7 @@
 import 'package:customer_app/types/driver_info.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'resolved_address.dart';
+import 'map_address.dart';
 
 enum ExTripStatus {
   submitted, // New trip submitted
@@ -31,8 +31,8 @@ String getTripStatusDescription(ExTripStatus status) =>
 
 class TripDataEntity {
   int? tripId;
-  final ResolvedAddress from;
-  final ResolvedAddress to;
+  final MapAddress from;
+  final MapAddress to;
   Polyline polyline;
   final int distanceMeters;
   final String distanceText;

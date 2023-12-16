@@ -1,13 +1,12 @@
 import 'package:customer_app/providers/active_trip.dart';
-import 'package:customer_app/types/resolved_address.dart';
+import 'package:customer_app/types/map_address.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart' as dir;
 import 'package:customer_app/api/google_api.dart';
 
 class MapHelper {
-  static Future<Polyline> getPolyline(
-      ResolvedAddress? from, ResolvedAddress? to) async {
+  static Future<Polyline> getPolyline(MapAddress? from, MapAddress? to) async {
     const Polyline temp = Polyline(
       polylineId: PolylineId('polyline-1'),
       width: 5,

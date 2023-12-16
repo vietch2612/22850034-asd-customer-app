@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vui lòng đăng nhập!'),
+        title: const Text('Khách hàng vui lòng đăng nhập'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

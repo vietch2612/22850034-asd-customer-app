@@ -3,7 +3,7 @@
 import 'package:customer_app/global.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/api/google_api.dart';
-import 'package:customer_app/types/resolved_address.dart';
+import 'package:customer_app/types/map_address.dart';
 import 'package:customer_app/ui/search_address.dart';
 import 'package:customer_app/providers/location.dart';
 import 'package:customer_app/ui/common.dart';
@@ -13,12 +13,12 @@ import 'package:google_maps_webservice/places.dart';
 class LocationScaffold extends StatelessWidget {
   LocationScaffold({Key? key}) : super(key: key);
 
-  final homeAddress = ResolvedAddress(
+  final homeAddress = MapAddress(
       location: Location(lat: 10.8428625, lng: 106.8346228),
       mainText: "Vinhomes Grand Park - Origami S7.01",
       secondaryText: "Long Bình, Hồ Chí Minh, VN");
 
-  void _setDemoLocation(BuildContext context, ResolvedAddress address) {
+  void _setDemoLocation(BuildContext context, MapAddress address) {
     final locProvider = LocationProvider.of(context, listen: false);
     locProvider.currentAddress = address;
   }
@@ -37,7 +37,7 @@ class LocationScaffold extends StatelessWidget {
         "formatted_address"
       ]);
 
-      final address = ResolvedAddress(
+      final address = MapAddress(
           location: placeDetails.result.geometry!.location,
           mainText: prd.structuredFormatting?.mainText ??
               placeDetails.result.addressComponents.join(','),

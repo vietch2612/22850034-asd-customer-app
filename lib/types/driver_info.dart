@@ -1,4 +1,4 @@
-import 'package:customer_app/types/resolved_address.dart';
+import 'package:customer_app/types/map_address.dart';
 import 'package:google_maps_webservice/directions.dart' as dir;
 
 class DriverInfo {
@@ -9,7 +9,7 @@ class DriverInfo {
   final String phoneNumber;
   final String avatarUrl;
   final int rating;
-  final ResolvedAddress currentLocation;
+  final MapAddress currentLocation;
 
   DriverInfo(
     this.id,
@@ -31,7 +31,7 @@ class DriverInfo {
       phoneNumber: json['Driver']['phoneNumber'],
       name: json['Driver']['name'],
       licensePlate: json['Driver']['licensePlateNumber'],
-      currentLocation: ResolvedAddress(
+      currentLocation: MapAddress(
         location: dir.Location(
           lat: json['Driver']['DriverLocations'][0]['lat'],
           lng: json['Driver']['DriverLocations'][0]['long'],

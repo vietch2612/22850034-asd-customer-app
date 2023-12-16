@@ -1,6 +1,6 @@
 import 'package:customer_app/socket/socket_service.dart';
 import 'package:customer_app/types/driver_info.dart';
-import 'package:customer_app/types/resolved_address.dart';
+import 'package:customer_app/types/map_address.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -67,7 +67,7 @@ class TripProvider with ChangeNotifier {
       activeTrip?.driverInfo = driverInfo;
       taxiMarkerLatLng = LatLng(driverInfo.currentLocation.location.lat,
           driverInfo.currentLocation.location.lng);
-      updateMapPoyline(driverInfo.currentLocation, activeTrip!.from);
+      redrawMapPolyline(driverInfo.currentLocation, activeTrip!.from);
       mapViewBoundsCallback?.call(taxiMarkerLatLng!, activeTrip!.from.toLatLng);
 
       notifyListeners();
@@ -82,7 +82,18 @@ class TripProvider with ChangeNotifier {
       activeTrip?.driverInfo = driverInfo;
       taxiMarkerLatLng = LatLng(driverInfo.currentLocation.location.lat,
           driverInfo.currentLocation.location.lng);
-      updateMapPoyline(driverInfo.currentLocation, activeTrip!.to);
+      redrawMapPolyline(driverInfo.currentLocation, activeTrip!.to);
+      mapViewBoundsCallback?.call(taxiMarkerLatLng!, activeTrip!.to.toLatLng);
+
+      notifyListeners();
+    });
+
+    socket!.on('trip_driver_driving_update', (data) async {
+      logger.i('Updating driver location', data);
+
+      taxiMarkerLatLng =
+          LatLng(data['driverLocation']['lat'], data['driverLocation']['long']);
+      // updateMapPolyline(driverInfo.currentLocation);
       mapViewBoundsCallback?.call(taxiMarkerLatLng!, activeTrip!.to.toLatLng);
 
       notifyListeners();
@@ -96,9 +107,7 @@ class TripProvider with ChangeNotifier {
   }
 
   TripDataEntity? activeTrip;
-
   bool get isActive => activeTrip != null;
-
   LatLng? taxiMarkerLatLng;
 
   LatLng getTaxiDrivePosition(double animationValue) {
@@ -137,9 +146,20 @@ class TripProvider with ChangeNotifier {
     SocketService.submitTripToSocket(socket, trip);
   }
 
-  void updateMapPoyline(ResolvedAddress from, ResolvedAddress to) async {
+  void redrawMapPolyline(MapAddress from, MapAddress to) async {
     Polyline newPolyline = await MapHelper.getPolyline(from, to);
     activeTrip?.polyline = newPolyline;
+    notifyListeners();
+  }
+
+  void updateMapPolyline(MapAddress newLocation) {
+    LatLng? lastPoint = activeTrip?.polyline.points.last;
+    LatLng interpolatedPoint = LatLng(
+      (lastPoint!.latitude + newLocation.location.lat) / 2,
+      (lastPoint.longitude + newLocation.location.lng) / 2,
+    );
+
+    activeTrip?.polyline.points.add(interpolatedPoint);
     notifyListeners();
   }
 

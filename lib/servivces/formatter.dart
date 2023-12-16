@@ -1,5 +1,3 @@
-// currency_formatter.dart
-
 import 'package:intl/intl.dart';
 
 Future<String> formatCurrency(int amount) async {

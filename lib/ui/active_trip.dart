@@ -175,12 +175,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                 if (mounted) {
                   mapController!.animateCamera(CameraUpdate.newLatLngBounds(
                       trip.activeTrip!.mapLatLngBounds, 10));
-
-                  final isDark =
-                      ThemeProvider.of(context, listen: false).isDark;
-
-                  controller.setMapStyle(
-                      isDark ? googleMapDarkStyle : googleMapDefaultStyle);
+                  controller.setMapStyle(googleMapDefaultStyle);
 
                   setState(() {});
                 }
@@ -194,7 +189,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: const Offset(0, -3), // changes position of shadow
+                    offset: const Offset(0, -3),
                   ),
                 ],
               ),
