@@ -4,6 +4,7 @@ import 'package:customer_app/types/map_address.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_app/types/trip.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/geocoding.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -93,8 +94,14 @@ class TripProvider with ChangeNotifier {
 
       taxiMarkerLatLng =
           LatLng(data['driverLocation']['lat'], data['driverLocation']['long']);
-      // updateMapPolyline(driverInfo.currentLocation);
-      mapViewBoundsCallback?.call(taxiMarkerLatLng!, activeTrip!.to.toLatLng);
+      updateMapPolyline(MapAddress(
+        location: Location(
+          lat: data['driverLocation']['lat'],
+          lng: data['driverLocation']['long'],
+        ),
+        mainText: '',
+        secondaryText: '',
+      ));
 
       notifyListeners();
     });
@@ -153,14 +160,18 @@ class TripProvider with ChangeNotifier {
   }
 
   void updateMapPolyline(MapAddress newLocation) {
-    LatLng? lastPoint = activeTrip?.polyline.points.last;
-    LatLng interpolatedPoint = LatLng(
-      (lastPoint!.latitude + newLocation.location.lat) / 2,
-      (lastPoint.longitude + newLocation.location.lng) / 2,
+    List<LatLng> polylinePoints = activeTrip?.polyline.points ?? [];
+
+    int indexToRemove = polylinePoints.indexWhere(
+      (point) =>
+          point.latitude == newLocation.location.lat &&
+          point.longitude == newLocation.location.lng,
     );
 
-    activeTrip?.polyline.points.add(interpolatedPoint);
-    notifyListeners();
+    if (indexToRemove != -1) {
+      activeTrip?.polyline.points.removeAt(indexToRemove - 1);
+      notifyListeners();
+    }
   }
 
   static TripProvider of(BuildContext context, {bool listen = true}) =>

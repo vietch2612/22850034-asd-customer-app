@@ -40,7 +40,7 @@ Widget tripFromTo(BuildContext context, TripDataEntity tripData) =>
                   "${tripData.driverInfo!.licensePlate} ${tripData.driverInfo!.carInfo}",
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 12)),
-              const SizedBox(width: 5), // Adjust spacing
+              const SizedBox(width: 3), // Adjust spacing
               Row(
                 children: [
                   const Icon(
@@ -134,7 +134,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                 child: GoogleMap(
               initialCameraPosition: trip.activeTrip!.cameraPosition ??
                   CameraPosition(
-                      target: trip.activeTrip!.from.toLatLng, zoom: 15),
+                      target: trip.activeTrip!.from.toLatLng, zoom: 10),
               mapType: MapType.normal,
               myLocationEnabled: true,
               zoomGesturesEnabled: true,
@@ -198,7 +198,7 @@ class _ActiveTripState extends State<ActiveTrip> {
                   tripFromTo(context, trip.activeTrip!),
                   const Divider(height: 1),
                   SizedBox(
-                      height: 80,
+                      height: 60,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -234,12 +234,14 @@ class _ActiveTripState extends State<ActiveTrip> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),
                             child: OutlinedButton(
-                                style: ThemeProvider.of(context)
-                                    .roundOutlinedButtonStyle,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
                                 onPressed: pendingUpdate
                                     ? null
                                     : () => trip.cancelTrip(),
-                                child: const Text('Huỷ')),
+                                child: const Text('Huỷ',
+                                    style: TextStyle(color: Colors.white))),
                           )
                         ],
                       )),

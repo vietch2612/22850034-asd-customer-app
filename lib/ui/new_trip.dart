@@ -259,7 +259,7 @@ class _NewTripState extends State<NewTrip> {
                   target: LocationProvider.of(context, listen: false)
                       .currentAddress!
                       .toLatLng,
-                  zoom: 15),
+                  zoom: 10),
               mapType: MapType.normal,
               myLocationEnabled: true,
               zoomGesturesEnabled: true,
@@ -388,7 +388,7 @@ class _NewTripState extends State<NewTrip> {
                     ),
               const Divider(height: 1),
               SizedBox(
-                  height: 80,
+                  height: 70,
                   child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -460,7 +460,7 @@ class _NewTripState extends State<NewTrip> {
                       ])),
               const Divider(height: 1),
               SizedBox(
-                  height: 80,
+                  height: 70,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -472,11 +472,7 @@ class _NewTripState extends State<NewTrip> {
                           children: [
                             if (from == null || to == null)
                               Shimmer.fromColors(
-                                  baseColor: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .color ??
-                                      Colors.black,
+                                  baseColor: Colors.green,
                                   highlightColor:
                                       Theme.of(context).colorScheme.secondary,
                                   child: Text(
@@ -508,13 +504,15 @@ class _NewTripState extends State<NewTrip> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: ElevatedButton(
-                            style: ThemeProvider.of(context).roundButtonStyle,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
                             onPressed: (tripDistanceText.isEmpty)
                                 ? null
                                 : () => startNewTrip(context),
                             child: const Row(children: [
-                              Icon(Icons.taxi_alert),
-                              SizedBox(width: 10),
+                              Icon(Icons.taxi_alert_rounded),
+                              SizedBox(width: 8),
                               Text('Đặt xe')
                             ])),
                       )
